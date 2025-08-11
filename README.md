@@ -1,1 +1,80 @@
-# claude-code-gpt-5
+# Claude Code with GPT-5
+
+## Quick Start ⚡
+
+### Prerequisites
+
+- [uv](https://github.com/astral-sh/uv) installed.
+- [OpenAI API](https://platform.openai.com/docs/api-reference) key 🔑
+- [Anthropic API](https://console.anthropic.com/) key 🔑
+
+### Setup 🛠️
+
+1. **Clone this repository**:
+   ```bash
+   git clone https://github.com/teremterem/claude-code-gpt-5.git
+   cd claude-code-gpt-5
+   ```
+
+2. **Install uv** (if you haven't already):
+
+   **macOS/Linux:**
+   ```bash
+   curl -LsSf https://astral.sh/uv/install.sh | sh
+   ```
+
+   **macOS (using [Homebrew](https://brew.sh/)):**
+   ```bash
+   brew install uv
+   ```
+
+   **Windows (using PowerShell):**
+   ```powershell
+   powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+   ```
+
+   **Windows (using Scoop):**
+   ```bash
+   scoop install uv
+   ```
+
+   **Alternative: pip install**
+   ```bash
+   pip install uv
+   ```
+
+3. **Configure Environment Variables**:
+   Create a `.env` file:
+   ```bash
+   touch .env
+   ```
+   Edit `.env` and add your API keys:
+   ```dotenv
+   OPENAI_API_KEY=your-openai-api-key-here
+   ANTHROPIC_API_KEY=your-anthropic-api-key-here
+   ```
+
+4. **Run the server**:
+   ```bash
+   uv run litellm --config config.yaml
+   ```
+
+### Using with Claude Code 🎮
+
+1. **Install Claude Code** (if you haven't already):
+   ```bash
+   npm install -g @anthropic-ai/claude-code
+   ```
+
+2. **Connect to your proxy**:
+   ```bash
+   ANTHROPIC_BASE_URL=http://localhost:4000 claude
+   ```
+
+3. **That's it!** Your Claude Code client will now use GPT-5. 🎯
+
+### Why the Anthropic API key is still required
+
+Claude Code uses two models: a fast model (for quick actions) and a slow “smart” model. This setup only replaces the slow model with GPT‑5 via the proxy; the fast model still runs on Anthropic, hence the need for the Anthropic API key.
+
+**NOTE:** You may see "Error: Streaming fallback triggered" throughout your interactions with Claude Code. This is harmless — streaming already falls back automatically. You can ignore this message for now.
