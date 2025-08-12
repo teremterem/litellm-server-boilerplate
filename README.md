@@ -1,12 +1,17 @@
 # Claude Code with GPT-5
 
+**NOTE:** You may see "Error: Streaming fallback triggered" throughout your interactions with Claude Code. This is harmless — streaming already falls back automatically. You can ignore this message for now.
+
 ## Quick Start ⚡
 
 ### Prerequisites
 
-- [uv](https://github.com/astral-sh/uv) installed.
 - [OpenAI API](https://platform.openai.com/docs/api-reference) key 🔑
 - [Anthropic API](https://console.anthropic.com/) key 🔑
+
+**Why the Anthropic API key is still required**
+
+Claude Code uses two models: a fast model (for quick actions) and a slow “smart” model. This setup only replaces the slow model with GPT‑5 via the proxy; the fast model still runs on Anthropic, hence the need for the Anthropic API key.
 
 ### Setup 🛠️
 
@@ -16,7 +21,7 @@
    cd claude-code-gpt-5
    ```
 
-2. **Install uv** (if you haven't already):
+2. **Install [uv](https://docs.astral.sh/uv/)** (if you haven't already):
 
    **macOS/Linux:**
    ```bash
@@ -72,9 +77,3 @@
    ```
 
 3. **That's it!** Your Claude Code client will now use GPT-5. 🎯
-
-### Why the Anthropic API key is still required
-
-Claude Code uses two models: a fast model (for quick actions) and a slow “smart” model. This setup only replaces the slow model with GPT‑5 via the proxy; the fast model still runs on Anthropic, hence the need for the Anthropic API key.
-
-**NOTE:** You may see "Error: Streaming fallback triggered" throughout your interactions with Claude Code. This is harmless — streaming already falls back automatically. You can ignore this message for now.
