@@ -1,8 +1,8 @@
 # Claude Code with GPT-5
 
 **NOTE:** Claude Code currently compains about the following problem when using certain tools: "Error: Streaming fallback triggered". We are waiting for the following LiteLLM bugfix to be merged and released to resolve this problem:
-- https://github.com/BerriAI/litellm/pull/13521
-- https://github.com/BerriAI/litellm/issues/13373
+- **PR:** https://github.com/BerriAI/litellm/pull/13521
+- **Issue:** https://github.com/BerriAI/litellm/issues/13373
 
 ## Quick Start ⚡
 
