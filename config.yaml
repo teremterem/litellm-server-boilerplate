@@ -3,6 +3,7 @@ model_list:
     litellm_params:
       model: openai/gpt-5
       api_key: os.environ/OPENAI_API_KEY
+      reasoning_effort: os.environ/REASONING_EFFORT
 
   - model_name: claude-3-5-haiku-20241022
     litellm_params:
