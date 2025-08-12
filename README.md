@@ -4,6 +4,9 @@
 - ***PR:*** *https://github.com/BerriAI/litellm/pull/13521*
 - ***Issue:*** *https://github.com/BerriAI/litellm/issues/13373*
 
+*Support for `reasoning_effort` parameter for GPT-5 by LiteLLM is not yet released either:*
+- ***PR:*** *https://github.com/BerriAI/litellm/pull/13510*
+
 ## Quick Start ⚡
 
 ### Prerequisites
@@ -51,14 +54,16 @@ Claude Code uses two models: a fast model (for quick actions) and a slow “smar
    ```
 
 3. **Configure Environment Variables**:
-   Create a `.env` file:
+   Copy the template file to create your `.env`:
    ```bash
-   touch .env
+   cp .env.template .env
    ```
    Edit `.env` and add your API keys:
    ```dotenv
    OPENAI_API_KEY=your-openai-api-key-here
    ANTHROPIC_API_KEY=your-anthropic-api-key-here
+   # Reasoning effort setting for GPT-5. Possible values: minimal, low, medium, high
+   REASONING_EFFORT=low
    ```
 
 4. **Run the server**:
