@@ -1,5 +1,4 @@
-# Claude Code with GPT-5
-
+![Claude Code with GPT-5](claude-code-gpt-5.jpeg)
 
 ## Quick Start ⚡
 
@@ -11,6 +10,11 @@
 **Why the Anthropic API key is still required**
 
 Claude Code uses two models: a fast model (for quick actions) and a slow “smart” model. This setup only replaces the slow model with GPT‑5 via the proxy; the fast model still runs on Anthropic, hence the need for the Anthropic API key.
+
+**First time using GPT-5 via API?**
+
+If you are going to use GPT-5 via API for the first time, **OpenAI may require you to verify your identity via Persona.** You may encounter an OpenAI error asking you to “verify your organization.” To resolve this, you can go through the verification process here:
+- [OpenAI developer platform - Organization settings](https://platform.openai.com/settings/organization/general)
 
 ### Setup 🛠️
 
@@ -78,3 +82,13 @@ Claude Code uses two models: a fast model (for quick actions) and a slow “smar
    ```
 
 3. **That's it!** Your Claude Code client will now use GPT-5. 🎯
+
+## KNOWN PROBLEM
+
+***The "Web Search" tool currently does not work with this setup.*** *You may see an error like:*
+
+```text
+API Error (500 {"error":{"message":"Error calling litellm.acompletion for non-Anthropic model: litellm.BadRequestError: OpenAIException - Invalid schema for function 'web_search': 'web_search_20250305' is not valid under any of the given schemas.","type":"None","param":"None","code":"500"}}) · Retrying in 1 seconds… (attempt 1/10)
+```
+
+***If your request requires searching the web, temporarily switch back to one of the Claude 4 models using the `/model` command in Claude Code.*** *Claude models remain available alongside `gpt-5` and will use the Anthropic API key from your `.env`.*
