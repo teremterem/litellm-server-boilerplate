@@ -1,5 +1,7 @@
 ![Claude Code with GPT-5](claude-code-gpt-5.jpeg)
 
+This repository lets you use **Claude Code** with **OpenAI's GPT-5** as the "smart" model via a local LiteLLM proxy.
+
 ## Quick Start ⚡
 
 ### Prerequisites
