@@ -1,11 +1,5 @@
 # Claude Code with GPT-5
 
-***NOTE:*** *Claude Code currently compains about the following problem when using tools with GPT-5:* ***"Error: Streaming fallback triggered".*** *We are waiting for the following LiteLLM bugfix to be merged and released to resolve this problem:*
-- ***PR:*** *https://github.com/BerriAI/litellm/pull/13521*
-- ***Issue:*** *https://github.com/BerriAI/litellm/issues/13373*
-
-*Support for `reasoning_effort` parameter for GPT-5 by LiteLLM is not yet released either:*
-- ***PR:*** *https://github.com/BerriAI/litellm/pull/13510*
 
 ## Quick Start ⚡
 
@@ -80,7 +74,7 @@ Claude Code uses two models: a fast model (for quick actions) and a slow “smar
 
 2. **Connect to your proxy**:
    ```bash
-   ANTHROPIC_BASE_URL=http://localhost:4000 claude
+   ANTHROPIC_BASE_URL=http://localhost:4000 claude --model gpt-5
    ```
 
 3. **That's it!** Your Claude Code client will now use GPT-5. 🎯
