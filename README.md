@@ -83,7 +83,7 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
    ANTHROPIC_BASE_URL=http://localhost:4000 claude --model gpt-5
    ```
 
-   **If you want to use `GPT-5-mini`, use the following command:**
+   **Or, to use `GPT-5-mini`, run this instead:**
    ```bash
    ANTHROPIC_BASE_URL=http://localhost:4000 claude --model gpt-5-mini
    ```
