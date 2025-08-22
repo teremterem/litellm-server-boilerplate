@@ -78,12 +78,17 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
    npm install -g @anthropic-ai/claude-code
    ```
 
-2. **Connect to your proxy**:
+2. **Connect to your proxy to use GPT-5**:
    ```bash
    ANTHROPIC_BASE_URL=http://localhost:4000 claude --model gpt-5
    ```
 
-3. **That's it!** Your Claude Code client will now use GPT-5. 🎯
+   **If you want to use GPT-5-mini, use the following command:**
+   ```bash
+   ANTHROPIC_BASE_URL=http://localhost:4000 claude --model gpt-5-mini
+   ```
+
+3. **That's it!** Your Claude Code client will now use **GPT-5** (or **GPT-5-mini**). 🎯
 
 ## KNOWN PROBLEM
 
