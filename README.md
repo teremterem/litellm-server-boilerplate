@@ -62,8 +62,6 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
    ```dotenv
    OPENAI_API_KEY=your-openai-api-key-here
    ANTHROPIC_API_KEY=your-anthropic-api-key-here
-   # Reasoning effort setting for GPT-5. Possible values: minimal, low, medium, high
-   REASONING_EFFORT=low
    ```
 
 4. **Run the server**:
@@ -78,17 +76,29 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
    npm install -g @anthropic-ai/claude-code
    ```
 
-2. **Connect to your proxy to use `GPT-5`**:
+2. **Connect to your proxy to use GPT-5 variants**:
    ```bash
-   ANTHROPIC_BASE_URL=http://localhost:4000 claude --model gpt-5
+   ANTHROPIC_BASE_URL=http://localhost:4000 claude --model gpt-5-reason-low
    ```
 
-   **Or, to use `GPT-5-mini`, run this instead:**
-   ```bash
-   ANTHROPIC_BASE_URL=http://localhost:4000 claude --model gpt-5-mini
-   ```
+   **Available models for the `--model` parameter:**
+   - **GPT-5**:
+      - `gpt-5-reason-minimal`
+      - `gpt-5-reason-low`
+      - `gpt-5-reason-medium`
+      - `gpt-5-reason-high`
+   - **GPT-5-mini**:
+      - `gpt-5-mini-reason-minimal`
+      - `gpt-5-mini-reason-low`
+      - `gpt-5-mini-reason-medium`
+      - `gpt-5-mini-reason-high`
+   - **GPT-5-nano**:
+      - `gpt-5-nano-reason-minimal`
+      - `gpt-5-nano-reason-low`
+      - `gpt-5-nano-reason-medium`
+      - `gpt-5-nano-reason-high`
 
-3. **That's it!** Your Claude Code client will now use **GPT-5** (or **GPT-5-mini**). 🎯
+3. **That's it!** Your Claude Code client will now use the selected **GPT-5 variant** with your chosen reasoning effort level. 🎯
 
 ## KNOWN PROBLEM
 
@@ -101,3 +111,14 @@ API Error (500 {"error":{"message":"Error calling litellm.acompletion for non-An
 **WORKAROUND:** If your request requires searching the web, temporarily switch back to one of the Claude 4 models using the `/model` command in Claude Code. Claude models remain available alongside `gpt-5` and will use the Anthropic API key from your `.env`.
 
 **The `Fetch` tool DOES work, though (getting web content from specific URLs).**
+
+## Adding More Models 🔧
+
+To support additional models beyond the pre-configured GPT-5 variants, you can modify the `config.yaml` file. Simply add new entries to the `model_list` following the existing format:
+
+```yaml
+- model_name: your-custom-model-name
+  litellm_params:
+    model: provider/model-name
+    # additional parameters as needed
+```
