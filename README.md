@@ -123,4 +123,4 @@ To support additional models beyond the pre-configured GPT-5 variants, you can m
     # additional parameters as needed
 ```
 
-## P.S. You are very welcome to join our [MiniAgents Discord Server 👥](https://discord.gg/ptSvVnbwKt)
+## P. S. You are very welcome to join our [MiniAgents Discord Server 👥](https://discord.gg/ptSvVnbwKt)
