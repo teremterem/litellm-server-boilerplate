@@ -84,7 +84,7 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
    **Available models for the `--model` parameter:**
    - **GPT-5**:
       - `gpt-5-reason-minimal`
-      - `gpt-5-reason-low`
+      - `gpt-5-reason-low` (recommended)
       - `gpt-5-reason-medium`
       - `gpt-5-reason-high`
    - **GPT-5-mini**:
