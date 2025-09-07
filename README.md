@@ -6,8 +6,8 @@ This repository lets you use **Anthropic's Claude Code** with **OpenAI's GPT-5**
 
 ### Prerequisites
 
-- [OpenAI API](https://platform.openai.com/docs/api-reference) key 🔑
-- [Anthropic API](https://console.anthropic.com/) key 🔑
+- [OpenAI API key](https://platform.openai.com/settings/organization/api-keys) 🔑
+- [Anthropic API key](https://console.anthropic.com/settings/keys) 🔑
 
 **Why the Anthropic API key is still required**
 
@@ -78,13 +78,13 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
 
 2. **Connect to your proxy to use GPT-5 variants**:
    ```bash
-   ANTHROPIC_BASE_URL=http://localhost:4000 claude --model gpt-5-reason-low
+   ANTHROPIC_BASE_URL=http://localhost:4000 claude --model gpt-5-reason-medium
    ```
 
    **Available models for the `--model` parameter:**
    - **GPT-5**:
       - `gpt-5-reason-minimal`
-      - `gpt-5-reason-low` (recommended)
+      - `gpt-5-reason-low`
       - `gpt-5-reason-medium`
       - `gpt-5-reason-high`
    - **GPT-5-mini**:
@@ -111,16 +111,5 @@ API Error (500 {"error":{"message":"Error calling litellm.acompletion for non-An
 **WORKAROUND:** If your request requires searching the web, temporarily switch back to one of the Claude 4 models using the `/model` command in Claude Code. Claude models remain available alongside `gpt-5` and will use the Anthropic API key from your `.env`.
 
 **The `Fetch` tool DOES work, though (getting web content from specific URLs).**
-
-## Adding More Models 🔧
-
-To support additional models beyond the pre-configured GPT-5 variants, you can modify the `config.yaml` file. Simply add new entries to the `model_list` following the existing format:
-
-```yaml
-- model_name: your-custom-model-name
-  litellm_params:
-    model: provider/model-name
-    # additional parameters as needed
-```
 
 ## P. S. You are very welcome to join our [MiniAgents Discord Server 👥](https://discord.gg/ptSvVnbwKt)
