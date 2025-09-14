@@ -93,7 +93,7 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
 
    **Alternatively, you can override the default model on the side of the CLI using the `--model` parameter:**
    ```bash
-   ANTHROPIC_BASE_URL=http://localhost:4000 claude --model gpt-5-reason-low
+   ANTHROPIC_BASE_URL=http://localhost:4000 claude --model gpt-5-reason-medium
    ```
 
 3. **That's it!** Your Claude Code client will now use the selected **GPT-5 variant** with your chosen reasoning effort level. 🎯
