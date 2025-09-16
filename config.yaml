@@ -1,0 +1,22 @@
+model_list:
+  - model_name: yoda-gpt
+    litellm_params:
+      model: custom/yoda-llm
+      custom_llm_provider: server.yoda_llm.YodaLLM
+
+general_settings:
+  master_key: ${LITELLM_MASTER_KEY}
+  database_url: ${DATABASE_URL}
+  base_url: ${LITELLM_BASE_URL}
+
+litellm_settings:
+  drop_params: false
+  set_verbose: ${LITELLM_VERBOSE:false}
+  json_logs: true
+  log_raw_request_response: ${LOG_RAW_REQUESTS:false}
+
+router_settings:
+  routing_strategy: simple-shuffle
+  num_retries: 3
+  timeout: 600
+  max_tokens: 4096
