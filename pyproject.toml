@@ -1,0 +1,35 @@
+[project]
+name = "litellm-server-boilerplate"
+version = "0.1.0"
+description = "A LiteLLM Proxy boilerplate with a custom provider that forces Yoda-speak responses. Managed with uv."
+readme = "README.md"
+requires-python = ">=3.11,<3.13"
+license = { text = "MIT" }
+authors = [
+  { name = "Your Name" }
+]
+
+dependencies = [
+  "litellm>=1.44.10",
+  "python-dotenv>=1.0.1",
+]
+
+[tool.uv]
+dev-dependencies = [
+  "pre-commit>=3.7.1",
+  "black>=24.8.0",
+  "pylint>=3.2.6",
+  "types-PyYAML>=6.0.12.20240808",
+]
+
+[tool.black]
+line-length = 119
+target-version = ["py311", "py312"]
+
+[tool.pylint.MASTER]
+extension-pkg-allow-list = []
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+

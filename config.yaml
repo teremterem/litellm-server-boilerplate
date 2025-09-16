@@ -1,0 +1,22 @@
+# LiteLLM Proxy configuration
+# This routes all requests through our custom provider that appends a Yoda-speak system prompt
+
+general_settings:
+  # Default temperature and other global params can go here
+  temperature: 0.7
+
+# Register a single logical model that maps to our custom provider
+model_list:
+  - model_name: yoda-proxy
+    litellm_params:
+      # The underlying model we'll forward to; can be changed via env/config
+      model: openai/gpt-5
+      # Tell LiteLLM to use our custom provider implementation
+      custom_llm_provider: server.custom_provider:YodaSpeakLLM
+
+# Optional: simple router to map any inbound model name to our single model above
+router:
+  - model_name: "*"
+    routing_strategy: simple
+    models:
+      - name: yoda-proxy

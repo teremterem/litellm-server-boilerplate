@@ -1,0 +1,28 @@
+repos:
+  - repo: local
+    hooks:
+      - id: black
+        name: black
+        entry: black
+        language: system
+        types: [python]
+      - id: pylint
+        name: pylint
+        entry: pylint
+        language: system
+        types: [python]
+        args: ["--rcfile=.pylintrc", "--output-format=colorized"]
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-merge-conflict
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: mixed-line-ending
+
+ci:
+  autofix_prs: true
+  autoupdate_schedule: monthly
