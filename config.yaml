@@ -1,0 +1,11 @@
+# LiteLLM Proxy Config - routes all models to our custom Yoda provider
+
+model_list:
+  - model_name: yoda-gpt5
+    litellm_params:
+      model: custom
+      custom_llm: "server/custom_yoda_llm.py:YodaLLM"
+
+# Optional general settings
+general_settings:
+  pass_through: true

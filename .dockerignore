@@ -1,0 +1,17 @@
+.git
+.gitignore
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.env
+.venv
+.uv/
+.venv/
+.mypy_cache/
+.pytest_cache/
+.dist/
+build/
+dist/
+*.egg-info/
+**/.DS_Store
