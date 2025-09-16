@@ -1,0 +1,28 @@
+model_list:
+  - model_name: yoda-gpt-5
+    litellm_params:
+      model: custom/yoda
+      custom_llm_provider: yoda
+
+litellm_settings:
+  # Enable logging
+  set_verbose: true
+
+  # Custom provider settings
+  custom_llm_provider:
+    yoda:
+      class_name: server.yoda_llm.YodaLLM
+
+  # General settings
+  max_budget: 100.0
+  budget_duration: 30d
+
+general_settings:
+  # Server configuration
+  master_key: sk-1234  # Change this in production
+
+  # CORS settings
+  cors_origins: ["*"]
+
+  # Database (optional - for usage tracking)
+  # database_url: "sqlite:///litellm_logs.db"
