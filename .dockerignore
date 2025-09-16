@@ -15,7 +15,6 @@ parts/
 sdist/
 var/
 wheels/
-share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
@@ -26,8 +25,14 @@ MANIFEST
 env/
 venv/
 ENV/
-env.bak/
-venv.bak/
+
+# Git
+.git/
+.gitignore
+
+# Environment files
+.env
+.env.*
 
 # IDE
 .vscode/
@@ -37,35 +42,20 @@ venv.bak/
 *~
 .DS_Store
 
-# Environment files
-.env
-.env.local
-.env.*.local
-
-# LiteLLM
-*.db
-*.sqlite
-*.log
-logs/
-
 # Testing
 .coverage
 htmlcov/
 .tox/
 .nox/
 .pytest_cache/
-.hypothesis/
 
-# MyPy
-.mypy_cache/
-.dmypy.json
-dmypy.json
+# Documentation
+*.md
+docs/
 
-# Pyre
-.pyre/
+# Pre-commit
+.pre-commit-config.yaml
 
-# pytype
-.pytype/
-
-# Cython
-cython_debug/
+# Build artifacts
+build/
+*.build/
