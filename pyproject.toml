@@ -1,0 +1,39 @@
+[project]
+name = "litellm-server-boilerplate"
+version = "0.1.0"
+description = "A LiteLLM proxy server boilerplate with custom model implementation"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "litellm>=1.54.14",
+    "python-dotenv>=1.0.0",
+    "pyyaml>=6.0.1",
+    "uvicorn>=0.34.0",
+    "fastapi>=0.115.5",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+dev-dependencies = [
+    "black>=24.10.0",
+    "pylint>=3.3.2",
+    "pre-commit>=4.0.1",
+    "pytest>=8.3.4",
+    "pytest-asyncio>=0.25.0",
+]
+
+[tool.black]
+line-length = 119
+target-version = ['py311']
+
+[tool.pylint.messages_control]
+max-line-length = 119
+
+[tool.pylint.format]
+max-line-length = 119
+
+[tool.hatch.build.targets.wheel]
+packages = ["server"]
