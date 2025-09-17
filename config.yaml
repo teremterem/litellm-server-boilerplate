@@ -1,0 +1,15 @@
+litellm_settings:
+  telemetry: false
+  custom_llm_modules:
+    - server.yoda_llm
+
+model_list:
+  - model_name: gpt-5-yoda
+    litellm_params:
+      model: openai/gpt-5
+      custom_llm: server.yoda_llm:YodaSpeakLLM
+      target_model: openai/gpt-5
+
+server_settings:
+  host: 0.0.0.0
+  port: 4000
