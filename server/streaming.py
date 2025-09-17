@@ -3,16 +3,12 @@
 from __future__ import annotations
 
 from collections.abc import AsyncIterable, AsyncIterator, Iterable, Iterator
-from typing import Any
+from typing import Any, Optional
 
-from litellm.types.llm_response import (
-    GenericDelta,
+from litellm import (
     GenericStreamingChunk,
-    GenericStreamingChoice,
     ModelResponseStream,
 )
-
-_TEXTUAL_CONTENT_KEYS = ("text", "content", "completion", "delta")
 
 
 def convert_stream(
@@ -37,150 +33,187 @@ def convert_async_stream(
 
 
 def _ensure_generic_chunk(chunk: ModelResponseStream) -> GenericStreamingChunk:
-    if isinstance(chunk, GenericStreamingChunk):
-        return chunk
+    """Best-effort convert a LiteLLM ModelResponseStream chunk into GenericStreamingChunk.
 
-    to_generic = getattr(chunk, "to_generic_stream_chunk", None)
-    if callable(to_generic):
-        generic_chunk = to_generic()
-        if isinstance(generic_chunk, GenericStreamingChunk):
-            return generic_chunk
+    GenericStreamingChunk TypedDict keys:
+      - text: str (required)
+      - is_finished: bool (required)
+      - finish_reason: str (required)
+      - usage: Optional[ChatCompletionUsageBlock] (we pass None for incremental chunks)
+      - index: int (default 0)
+      - tool_use: Optional[ChatCompletionToolCallChunk] (default None)
+      - provider_specific_fields: Optional[dict]
+    """
+    # We don't really care about the readability of this function - it was vibe-coded without review
+    # pylint: disable=too-many-locals,too-many-branches,too-many-statements
 
-    payload = getattr(chunk, "chunk", None)
-    provider = getattr(chunk, "provider", None)
-    usage = getattr(chunk, "usage", None)
-    provider_response = getattr(chunk, "provider_response", None)
-
-    if payload is None:
-        payload = getattr(chunk, "raw_chunk", None)
-    if payload is None and isinstance(chunk, dict):
-        payload = chunk
-
-    choices_payload: list[Any] = []
-    if isinstance(payload, dict):
-        raw_choices = payload.get("choices")
-        if isinstance(raw_choices, list):
-            choices_payload = raw_choices
-    choice_attr = getattr(chunk, "choices", None)
-    if isinstance(choice_attr, list) and not choices_payload:
-        choices_payload = choice_attr
-
-    if not choices_payload and payload is not None:
-        choices_payload = [_wrap_choice_like(payload)]
-
-    choices = _build_generic_choices(choices_payload)
+    # Defaults
+    text: str = ""
+    finish_reason: str = ""
+    is_finished: bool = False
+    index: int = 0
+    provider_specific_fields: Optional[dict[str, Any]] = None
+    tool_use: Optional[dict[str, Any]] = None
 
     try:
-        return GenericStreamingChunk(
-            choices=choices,
-            provider_chunk=payload,
-            provider_response=provider_response,
-            provider=provider,
-            usage=usage,
-        )
-    except Exception:  # pylint: disable=broad-except
-        return GenericStreamingChunk(choices=choices)
+        # chunk may be a pydantic object with attributes
+        choices = getattr(chunk, "choices", None)
+        provider_specific_fields = getattr(chunk, "provider_specific_fields", None)
 
+        if isinstance(choices, list) and choices:
+            choice = choices[0]
+            # Try common OpenAI-like shapes
+            delta = getattr(choice, "delta", None)
+            if delta is not None:
+                # delta might be an object or dict
+                content = getattr(delta, "content", None)
+                if content is None and isinstance(delta, dict):
+                    content = delta.get("content")
+                if isinstance(content, str):
+                    text = content
 
-def _build_generic_choices(payload: Iterable[Any]) -> list[GenericStreamingChoice]:
-    generic_choices: list[GenericStreamingChoice] = []
-    for index, choice in enumerate(payload):
-        if isinstance(choice, GenericStreamingChoice):
-            generic_choices.append(choice)
-            continue
+                # TOOL CALLS (OpenAI-style incremental tool_calls on delta)
+                # Attempt to normalize to a ChatCompletionToolCallChunk-like dict
+                # Expected shape (best-effort):
+                # { index: int, id: Optional[str], type: "function", function: {name: str|None, arguments: str|None} }
+                tool_calls = getattr(delta, "tool_calls", None)
+                if tool_calls is None and isinstance(delta, dict):
+                    tool_calls = delta.get("tool_calls")
+                if isinstance(tool_calls, list) and tool_calls:
+                    tc = tool_calls[0]
 
-        finish_reason: str | None = None
-        raw_delta: Any = None
+                    # tc can be a dict or object with attributes
+                    def _get(obj, key, default=None):
+                        if isinstance(obj, dict):
+                            return obj.get(key, default)
+                        return getattr(obj, key, default)
 
-        if isinstance(choice, dict):
-            finish_reason = choice.get("finish_reason")
-            if "delta" in choice:
-                raw_delta = choice["delta"]
-            elif "message" in choice:
-                raw_delta = choice["message"]
-            elif "content" in choice:
-                raw_delta = {"content": choice["content"]}
-            elif "text" in choice:
-                raw_delta = {"content": choice["text"]}
-            else:
-                raw_delta = _pull_text_payload(choice)
-            choice_index = choice.get("index", index)
-        else:
-            choice_index = index
-            raw_delta = choice
+                    tc_index = _get(tc, "index", 0)
+                    tc_id = _get(tc, "id", None)
+                    tc_type = _get(tc, "type", "function")
+                    fn = _get(tc, "function", {})
+                    fn_name = _get(fn, "name", None)
+                    fn_args = _get(fn, "arguments", None)
+                    # Ensure arguments is a string for streaming deltas
+                    if fn_args is not None and not isinstance(fn_args, str):
+                        try:
+                            # Last resort stringification for partial structured args
+                            fn_args = str(fn_args)
+                        except Exception as e:
+                            raise RuntimeError(
+                                f"Failed to convert OpenAI tool_use to GenericStreamingChunk: {e}"
+                            ) from e
 
-        delta = _normalize_delta(raw_delta)
-        generic_choices.append(
-            GenericStreamingChoice(
-                index=choice_index,
-                finish_reason=finish_reason,
-                delta=delta,
-            )
-        )
+                    tool_use = {
+                        "index": tc_index if isinstance(tc_index, int) else 0,
+                        "id": tc_id if isinstance(tc_id, str) else None,
+                        "type": tc_type if isinstance(tc_type, str) else "function",
+                        "function": {
+                            "name": fn_name if isinstance(fn_name, str) else None,
+                            "arguments": fn_args if isinstance(fn_args, str) else None,
+                        },
+                    }
 
-    return generic_choices
+                # Anthropic-style tool_use block on delta
+                if tool_use is None:
+                    a_tool_use = getattr(delta, "tool_use", None)
+                    if a_tool_use is None and isinstance(delta, dict):
+                        a_tool_use = delta.get("tool_use")
+                    if a_tool_use is not None:
 
+                        def _get(obj, key, default=None):
+                            if isinstance(obj, dict):
+                                return obj.get(key, default)
+                            return getattr(obj, key, default)
 
-def _normalize_delta(raw_delta: Any) -> GenericDelta:
-    if isinstance(raw_delta, GenericDelta):
-        return raw_delta
+                        tu_id = _get(a_tool_use, "id", None)
+                        tu_name = _get(a_tool_use, "name", None)
+                        tu_input = _get(a_tool_use, "input", None)
+                        # Represent input as a string for arguments to keep consistency
+                        if tu_input is not None and not isinstance(tu_input, str):
+                            try:
+                                tu_input = str(tu_input)
+                            except Exception as e:
+                                raise RuntimeError(
+                                    f"Failed to convert Anthropic tool_use to GenericStreamingChunk: {e}"
+                                ) from e
 
-    role: str | None = None
-    content: Any = None
-    tool_calls: Any = None
+                        tool_use = {
+                            "index": 0,
+                            "id": tu_id if isinstance(tu_id, str) else None,
+                            "type": "function",
+                            "function": {
+                                "name": tu_name if isinstance(tu_name, str) else None,
+                                "arguments": tu_input if isinstance(tu_input, str) else None,
+                            },
+                        }
 
-    if isinstance(raw_delta, dict):
-        role = raw_delta.get("role")
-        tool_calls = raw_delta.get("tool_calls") or raw_delta.get("tools")
-        content = _extract_content_from_dict(raw_delta)
-    elif raw_delta is not None:
-        content = str(raw_delta)
+                # Older OpenAI-style function_call on delta
+                if tool_use is None:
+                    function_call = getattr(delta, "function_call", None)
+                    if function_call is None and isinstance(delta, dict):
+                        function_call = delta.get("function_call")
+                    if function_call is not None:
+                        # function_call can be dict-like or object-like
+                        fn_name = None
+                        fn_args = None
+                        if isinstance(function_call, dict):
+                            fn_name = function_call.get("name")
+                            fn_args = function_call.get("arguments")
+                        else:
+                            fn_name = getattr(function_call, "name", None)
+                            fn_args = getattr(function_call, "arguments", None)
+                        if fn_args is not None and not isinstance(fn_args, str):
+                            try:
+                                fn_args = str(fn_args)
+                            except Exception as e:
+                                raise RuntimeError(
+                                    f"Failed to convert OpenAI function_call to GenericStreamingChunk: {e}"
+                                ) from e
 
-    normalized_content = None
-    if isinstance(content, list):
-        normalized_content = _combine_content_list(content)
-    elif content is not None:
-        normalized_content = str(content)
+                        tool_use = {
+                            "index": 0,
+                            "id": None,
+                            "type": "function",
+                            "function": {
+                                "name": fn_name if isinstance(fn_name, str) else None,
+                                "arguments": fn_args if isinstance(fn_args, str) else None,
+                            },
+                        }
 
-    return GenericDelta(role=role, content=normalized_content, tool_calls=tool_calls)
+            # Some providers use `text`
+            if not text:
+                content_text = getattr(choice, "text", None)
+                if isinstance(content_text, str):
+                    text = content_text
 
+            # Finish reason & index if available
+            fr = getattr(choice, "finish_reason", None)
+            if isinstance(fr, str):
+                finish_reason = fr
+                is_finished = bool(fr)
 
-def _extract_content_from_dict(data: dict[str, Any]) -> Any:
-    if "content" in data:
-        return data["content"]
+            idx = getattr(choice, "index", None)
+            if isinstance(idx, int):
+                index = idx
 
-    for key in _TEXTUAL_CONTENT_KEYS:
-        if key in data:
-            return data[key]
+        # Fallbacks
+        if not isinstance(text, str):
+            text = ""
+        if not isinstance(finish_reason, str):
+            finish_reason = ""
+        if not isinstance(index, int):
+            index = 0
 
-    return data
+    except Exception as e:
+        raise RuntimeError(f"Failed to convert ModelResponseStream to GenericStreamingChunk: {e}") from e
 
-
-def _combine_content_list(segments: list[Any]) -> str:
-    parts: list[str] = []
-    for segment in segments:
-        if isinstance(segment, dict):
-            if "text" in segment:
-                parts.append(str(segment["text"]))
-            elif "content" in segment:
-                parts.append(str(segment["content"]))
-        elif segment is not None:
-            parts.append(str(segment))
-    return "".join(parts)
-
-
-def _pull_text_payload(data: dict[str, Any]) -> dict[str, Any]:
-    fallback: dict[str, Any] = {}
-    for key in _TEXTUAL_CONTENT_KEYS:
-        if key in data:
-            fallback["content"] = data[key]
-            break
-    if not fallback:
-        fallback["content"] = str(data)
-    return fallback
-
-
-def _wrap_choice_like(payload: Any) -> dict[str, Any]:
-    if isinstance(payload, dict):
-        return payload
-    return {"content": payload}
+    return {
+        "text": text,
+        "is_finished": is_finished,
+        "finish_reason": finish_reason,
+        "usage": None,  # TODO Do we have to put anything in here ?
+        "index": index,
+        "tool_use": tool_use,
+        "provider_specific_fields": provider_specific_fields,
+    }

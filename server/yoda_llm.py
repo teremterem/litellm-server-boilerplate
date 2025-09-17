@@ -1,15 +1,11 @@
-"""Custom LiteLLM provider that rewrites prompts for Yoda-speak."""
+from typing import Any, AsyncGenerator, Callable, Generator, Optional, Union
 
-from __future__ import annotations
+import httpx
+import litellm
+from litellm import CustomLLM, GenericStreamingChunk, HTTPHandler, ModelResponse, AsyncHTTPHandler
 
-from collections.abc import AsyncIterator, Iterator
-from typing import Any
+from server.streaming import _ensure_generic_chunk
 
-from litellm import acompletion, astream, completion, stream
-from litellm.integrations.custom_llm import CustomLLM
-from litellm.types.llm_response import GenericStreamingChunk
-
-from .streaming import convert_async_stream, convert_stream
 
 _YODA_SYSTEM_PROMPT = {
     "role": "system",
@@ -23,32 +19,147 @@ _YODA_SYSTEM_PROMPT = {
 class YodaSpeakLLM(CustomLLM):
     """Proxy wrapper that forces Yoda-speak responses from the underlying LLM."""
 
-    def __init__(self, *, target_model: str = "openai/gpt-5", **kwargs: Any) -> None:
+    def __init__(self, *, target_model: str = "openai/gpt-4o", **kwargs: Any) -> None:
         super().__init__(**kwargs)
         self.target_model = target_model
 
-    def completion(self, *args: Any, **kwargs: Any) -> Any:
-        prepared = self._prepare_kwargs(kwargs)
-        return completion(*args, **prepared)
+    def completion(
+        self,
+        model: str,
+        messages: list,
+        api_base: str,
+        custom_prompt_dict: dict,
+        model_response: ModelResponse,
+        print_verbose: Callable,
+        encoding,
+        api_key,
+        logging_obj,
+        optional_params: dict,
+        acompletion=None,
+        litellm_params=None,
+        logger_fn=None,
+        headers=None,
+        timeout: Optional[Union[float, httpx.Timeout]] = None,
+        client: Optional[HTTPHandler] = None,
+    ) -> ModelResponse:
+        optional_params.pop("max_tokens", None)
 
-    async def acompletion(self, *args: Any, **kwargs: Any) -> Any:
-        prepared = self._prepare_kwargs(kwargs)
-        return await acompletion(*args, **prepared)
+        response = litellm.completion(
+            model=self.target_model,
+            messages=messages + [_YODA_SYSTEM_PROMPT],
+            logger_fn=logger_fn,
+            headers=headers or {},
+            timeout=timeout,
+            client=client,
+            drop_params=True,  # Drop any params that are not supported by the provider
+            **optional_params,
+        )
+        return response
 
-    def streaming(self, *args: Any, **kwargs: Any) -> Iterator[GenericStreamingChunk]:
-        prepared = self._prepare_kwargs(kwargs)
-        provider_stream = stream(*args, **prepared)
-        return convert_stream(provider_stream)
+    async def acompletion(
+        self,
+        model: str,
+        messages: list,
+        api_base: str,
+        custom_prompt_dict: dict,
+        model_response: ModelResponse,
+        print_verbose: Callable,
+        encoding,
+        api_key,
+        logging_obj,
+        optional_params: dict,
+        acompletion=None,
+        litellm_params=None,
+        logger_fn=None,
+        headers=None,
+        timeout: Optional[Union[float, httpx.Timeout]] = None,
+        client: Optional[AsyncHTTPHandler] = None,
+    ) -> ModelResponse:
+        optional_params.pop("max_tokens", None)
 
-    async def astreaming(self, *args: Any, **kwargs: Any) -> AsyncIterator[GenericStreamingChunk]:
-        prepared = self._prepare_kwargs(kwargs)
-        provider_stream = astream(*args, **prepared)
-        return convert_async_stream(provider_stream)
+        response = await litellm.acompletion(
+            model=self.target_model,
+            messages=messages + [_YODA_SYSTEM_PROMPT],
+            logger_fn=logger_fn,
+            headers=headers or {},
+            timeout=timeout,
+            client=client,
+            drop_params=True,  # Drop any params that are not supported by the provider
+            **optional_params,
+        )
+        return response
 
-    def _prepare_kwargs(self, kwargs: dict[str, Any]) -> dict[str, Any]:
-        prepared = dict(kwargs)
-        messages = list(prepared.get("messages", []) or [])
-        messages.append(_YODA_SYSTEM_PROMPT)
-        prepared["messages"] = messages
-        prepared.setdefault("model", self.target_model)
-        return prepared
+    def streaming(
+        self,
+        model: str,
+        messages: list,
+        api_base: str,
+        custom_prompt_dict: dict,
+        model_response: ModelResponse,
+        print_verbose: Callable,
+        encoding,
+        api_key,
+        logging_obj,
+        optional_params: dict,
+        acompletion=None,
+        litellm_params=None,
+        logger_fn=None,
+        headers=None,
+        timeout: Optional[Union[float, httpx.Timeout]] = None,
+        client: Optional[HTTPHandler] = None,
+    ) -> Generator[GenericStreamingChunk, None, None]:
+        optional_params["stream"] = True
+        optional_params.pop("max_tokens", None)
+
+        response = litellm.completion(
+            model=self.target_model,
+            messages=messages + [_YODA_SYSTEM_PROMPT],
+            logger_fn=logger_fn,
+            headers=headers or {},
+            timeout=timeout,
+            client=client,
+            drop_params=True,  # Drop any params that are not supported by the provider
+            **optional_params,
+        )
+        for chunk in response:
+            generic_chunk = _ensure_generic_chunk(chunk)
+            yield generic_chunk
+
+    async def astreaming(
+        self,
+        model: str,
+        messages: list,
+        api_base: str,
+        custom_prompt_dict: dict,
+        model_response: ModelResponse,
+        print_verbose: Callable,
+        encoding,
+        api_key,
+        logging_obj,
+        optional_params: dict,
+        acompletion=None,
+        litellm_params=None,
+        logger_fn=None,
+        headers=None,
+        timeout: Optional[Union[float, httpx.Timeout]] = None,
+        client: Optional[AsyncHTTPHandler] = None,
+    ) -> AsyncGenerator[GenericStreamingChunk, None]:
+        optional_params["stream"] = True
+        optional_params.pop("max_tokens", None)
+
+        response = await litellm.acompletion(
+            model=self.target_model,
+            messages=messages + [_YODA_SYSTEM_PROMPT],
+            logger_fn=logger_fn,
+            headers=headers or {},
+            timeout=timeout,
+            client=client,
+            drop_params=True,  # Drop any params that are not supported by the provider
+            **optional_params,
+        )
+        async for chunk in response:
+            generic_chunk = _ensure_generic_chunk(chunk)
+            yield generic_chunk
+
+
+yoda_speak_llm = YodaSpeakLLM()
