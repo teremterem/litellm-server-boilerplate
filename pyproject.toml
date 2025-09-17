@@ -1,0 +1,41 @@
+[project]
+name = "litellm-server-boilerplate"
+version = "0.1.0"
+description = "LiteLLM Proxy boilerplate with custom Yoda-speak provider"
+authors = [
+  { name = "Your Name" }
+]
+requires-python = ">=3.11,<3.13"
+dependencies = [
+  "litellm>=1.43.8",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.black]
+line-length = 119
+target-version = ["py311", "py312"]
+
+[dependency-groups]
+dev = [
+  "black>=24.0.0",
+  "pylint>=3.2.0",
+  "pre-commit>=3.7.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["server"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "server",
+  "pyproject.toml",
+  "config.yaml",
+  ".pre-commit-config.yaml",
+  ".python-version",
+  ".env.template",
+  "README.md",
+  "LICENSE",
+]

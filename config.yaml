@@ -1,0 +1,11 @@
+litellm_settings:
+  custom_llm_modules:
+    - server/custom_yoda.py
+
+server_settings:
+  host: 0.0.0.0
+  port: ${PORT-4000}
+
+model_list:
+  - model_name: yoda
+    litellm_provider: custom_yoda

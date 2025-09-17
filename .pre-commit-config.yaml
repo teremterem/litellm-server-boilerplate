@@ -1,0 +1,24 @@
+repos:
+  - repo: local
+    hooks:
+      - id: black
+        name: black (uv local)
+        entry: uv run black
+        language: system
+        types: [python]
+        args: ["--line-length=119"]
+      - id: pylint
+        name: pylint (uv local)
+        entry: uv run pylint
+        language: system
+        types: [python]
+        args: ["-j", "0"]
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: check-added-large-files
+      - id: check-merge-conflict
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+      - id: trailing-whitespace
+      - id: check-yaml
