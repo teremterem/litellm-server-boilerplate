@@ -1,0 +1,11 @@
+model_list:
+  - model_name: "*"
+    litellm_provider: custom
+    custom_llm: "server.yoda_llm:YodaLLM"
+
+environment_variables:
+  - OPENAI_API_KEY
+
+proxy_settings:
+  host: 0.0.0.0
+  port: 8000

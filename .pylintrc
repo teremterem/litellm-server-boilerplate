@@ -1,0 +1,63 @@
+[MASTER]
+ignore=venv,.venv,build,dist
+jobs=0
+persistent=yes
+unsafe-load-any-extension=no
+extension-pkg-whitelist=
+
+[MESSAGES CONTROL]
+disable=
+    missing-module-docstring,
+    missing-class-docstring,
+    missing-function-docstring
+
+[REPORTS]
+output-format=text
+reports=no
+
+[LOGGING]
+logging-modules=logging
+
+[FORMAT]
+max-line-length=119
+indent-string='    '
+
+[BASIC]
+good-names=i,j,k,ex,Run,_,id,pk
+bad-names=foo,bar,baz
+
+[TYPECHECK]
+ignore-mixin-members=yes
+
+[DESIGN]
+max-args=10
+max-attributes=15
+max-bool-expr=5
+max-branches=15
+max-locals=25
+max-parents=7
+max-public-methods=30
+max-returns=6
+max-statements=100
+
+[SIMILARITIES]
+ignore-comments=yes
+ignore-docstrings=yes
+ignore-imports=yes
+min-similarity-lines=4
+
+[VARIABLES]
+allow-global-unused-variables=no
+allowed-redefined-builtins=
+
+[STRING]
+check-str-concat-over-line-jumps=yes
+
+[IMPORTS]
+extensions=
+
+[CLASSES]
+check-protected-access=no
+
+[EXCEPTIONS]
+overgeneral-exceptions=Exception
