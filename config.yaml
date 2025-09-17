@@ -1,0 +1,35 @@
+model_list:
+  - model_name: yoda-gpt-5
+    litellm_params:
+      model: yoda-gpt-5
+      custom_llm_provider: yoda_llm
+      api_key: os.environ/OPENAI_API_KEY
+
+litellm_settings:
+  # Enable custom LLM provider
+  custom_provider_map:
+    yoda_llm: server.yoda_llm.YodaLLM
+
+  # Logging configuration
+  set_verbose: false
+
+  # Request settings
+  max_tokens: 4000
+  temperature: 0.7
+
+general_settings:
+  # Master key for accessing the proxy
+  master_key: os.environ/LITELLM_MASTER_KEY
+
+  # Database configuration (optional - uses in-memory by default)
+  # database_url: "sqlite:///litellm.db"
+
+  # CORS settings
+  cors_origins: ["*"]
+
+  # Server configuration
+  port: 8000
+  host: "0.0.0.0"
+
+  # Health check endpoint
+  health_check_interval: 300
