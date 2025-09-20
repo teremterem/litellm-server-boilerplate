@@ -6,12 +6,9 @@ This repository lets you use **Anthropic's Claude Code CLI** with **OpenAI's GPT
 
 ### Prerequisites
 
-- [OpenAI API key](https://platform.openai.com/settings/organization/api-keys) 🔑
-- [Anthropic API key](https://console.anthropic.com/settings/keys) - optional 🔑
-
-**About the Anthropic API key**
-
-By default, the provided `.env` template (`.env.template` that you will have to copy to `.env`) remaps Claude models (haiku/sonnet/opus) to GPT‑5 equivalents, so all requests go to OpenAI. If you want to keep using Anthropic for any calls, set `ANTHROPIC_API_KEY` and adjust the `REMAP_*` variables in `.env` (or set some/all of them to empty strings).
+- [OpenAI API key 🔑](https://platform.openai.com/settings/organization/api-keys)
+- [Anthropic API key 🔑](https://console.anthropic.com/settings/keys) - optional (if you decide not to remap to OpenAI in certain scenarios)
+- Either [uv](https://docs.astral.sh/uv/getting-started/installation/) or [Docker Desktop](https://docs.docker.com/desktop/), depending on your preferred setup method
 
 **First time using GPT-5 via API?**
 
@@ -26,39 +23,13 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
    cd claude-code-gpt-5
    ```
 
-2. **Install [uv](https://docs.astral.sh/uv/)** (if you haven't already):
+2. **Configure Environment Variables**:
 
-   **macOS/Linux:**
-   ```bash
-   curl -LsSf https://astral.sh/uv/install.sh | sh
-   ```
-
-   **macOS (using [Homebrew](https://brew.sh/)):**
-   ```bash
-   brew install uv
-   ```
-
-   **Windows (using PowerShell):**
-   ```powershell
-   powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
-   ```
-
-   **Windows (using Scoop):**
-   ```bash
-   scoop install uv
-   ```
-
-   **Alternative: pip install**
-   ```bash
-   pip install uv
-   ```
-
-3. **Configure Environment Variables**:
    Copy the template file to create your `.env`:
    ```bash
    cp .env.template .env
    ```
-   Edit `.env` and add your API keys:
+   Edit `.env` and add your OpenAI API key:
    ```dotenv
    OPENAI_API_KEY=your-openai-api-key-here
    # Optional: only needed if you plan to use Anthropic models
@@ -74,10 +45,19 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
    ...
    ```
 
-4. **Run the server**:
+3. **Run the server:**
+
+   Either via `uv`:
    ```bash
    uv run litellm --config config.yaml
    ```
+
+   Or via `Docker`:
+   ```bash
+   ./deploy-docker.sh
+   ```
+
+   > **NOTE:** For more detailed `Docker` deployment instructions and more deployment options (like using `Docker Compose`, building the image yourself, etc.), see [DOCKER_DEPLOYMENT.md](DOCKER_DEPLOYMENT.md)
 
 ### Using with Claude Code 🎮
 
@@ -86,17 +66,21 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
    npm install -g @anthropic-ai/claude-code
    ```
 
-2. **Connect to your proxy to use GPT-5 variants**:
+2. **Connect to GPT-5 instead of Claude:**
+
+   Recommended:
    ```bash
    ANTHROPIC_BASE_URL=http://localhost:4000 claude
    ```
 
-   **Alternatively, you can override the default model on the side of the CLI using the `--model` parameter:**
+   Optionally, you can override the default model on the CLI side with:
    ```bash
    ANTHROPIC_BASE_URL=http://localhost:4000 claude --model gpt-5-reason-medium
    ```
 
-3. **That's it!** Your Claude Code client will now use the selected **GPT-5 variant** with your chosen reasoning effort level. 🎯
+   > **NOTE:** The former is more desirable than the latter - relying solely on the remap env vars and not explicitly setting the model in the CLI eliminates confusion when it comes to CLI's built-in agents, which are hardwired to always use a specific Claude model and will ignore the CLI's global model choice anyway.
+
+4. **That's it!** Your Claude Code client will now use the selected **GPT-5 variant(s)** with your chosen reasoning effort level(s). 🎯
 
 ### Available GPT-5 model aliases
 
@@ -120,7 +104,7 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
 
 ## KNOWN PROBLEM
 
-**The `Web Search` tool currently does not work with this setup.** You may see an error like:
+The `Web Search` tool currently does not work with this setup. You may see an error like:
 
 ```text
 API Error (500 {"error":{"message":"Error calling litellm.acompletion for non-Anthropic model: litellm.BadRequestError: OpenAIException - Invalid schema for function 'web_search': 'web_search_20250305' is not valid under any of the given schemas.","type":"None","param":"None","code":"500"}}) · Retrying in 1 seconds… (attempt 1/10)
