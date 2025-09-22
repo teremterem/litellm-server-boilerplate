@@ -10,20 +10,20 @@ This repository lets you use **Anthropic's Claude Code CLI** with **OpenAI's GPT
 - [Anthropic API key 🔑](https://console.anthropic.com/settings/keys) - optional (if you decide not to remap to OpenAI in certain scenarios)
 - Either [uv](https://docs.astral.sh/uv/getting-started/installation/) or [Docker Desktop](https://docs.docker.com/desktop/), depending on your preferred setup method
 
-**First time using GPT-5 via API?**
+### First time using GPT-5 via API?
 
 If you are going to use GPT-5 via API for the first time, **OpenAI may require you to verify your identity via Persona.** You may encounter an OpenAI error asking you to “verify your organization.” To resolve this, you can go through the verification process here:
 - [OpenAI developer platform - Organization settings](https://platform.openai.com/settings/organization/general)
 
 ### Setup 🛠️
 
-1. **Clone this repository**:
+1. **Clone this repository:**
    ```bash
    git clone https://github.com/teremterem/claude-code-gpt-5.git
    cd claude-code-gpt-5
    ```
 
-2. **Configure Environment Variables**:
+2. **Configure Environment Variables:**
 
    Copy the template file to create your `.env`:
    ```bash
@@ -45,19 +45,44 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
    ...
    ```
 
-3. **Run the server:**
+3. **Run the proxy:**
 
-   Either via `uv`:
-   ```bash
-   uv run litellm --config config.yaml
-   ```
+   1) **EITHER via `uv`** (make sure to install [uv](https://docs.astral.sh/uv/getting-started/installation/) first):
 
-   Or via `Docker`:
-   ```bash
-   ./deploy-docker.sh
-   ```
+      **OPTION 1:** Use a script for `uv`:
+      ```bash
+      ./uv-run.sh
+      ```
 
-   > **NOTE:** For more detailed `Docker` deployment instructions and more deployment options (like using `Docker Compose`, building the image yourself, etc.), see [DOCKER_DEPLOYMENT.md](DOCKER_DEPLOYMENT.md)
+      **OPTION 2:** Run via a direct `uv` command:
+      ```bash
+      uv run litellm --config config.yaml
+      ```
+
+   2) **OR via `Docker`** (make sure to install [Docker Desktop](https://docs.docker.com/desktop/install/mac-install/) first):
+
+      **OPTION 3:** Run `Docker` in the foreground:
+      ```bash
+      ./run-docker.sh
+      ```
+
+      **OPTION 4:** Run `Docker` in the background:
+      ```bash
+      ./deploy-docker.sh
+      ```
+
+      **OPTION 5:** Run `Docker` via a direct command:
+      ```bash
+      docker run -d \
+         --name claude-code-gpt-5 \
+         -p 4000:4000 \
+         --env-file .env \
+         --restart unless-stopped \
+         ghcr.io/teremterem/claude-code-gpt-5:latest
+      ```
+      > **NOTE:** To run with this command in the foreground instead of the background, remove the `-d` flag.
+
+      > **NOTE:** The `Docker` options above will pull the latest image from `GHCR` and will ignore all your local files except `.env`. For more detailed `Docker` deployment instructions and more options (like watching logs, building `Docker` image from source yourself, using `Docker Compose`, etc.), see [DOCKER_DEPLOYMENT.md](DOCKER_DEPLOYMENT.md)
 
 ### Using with Claude Code 🎮
 
@@ -79,6 +104,15 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
    ```
 
    > **NOTE:** The former is more desirable than the latter - relying solely on the remap env vars and not explicitly setting the model in the CLI eliminates confusion when it comes to CLI's built-in agents, which are hardwired to always use a specific Claude model and will ignore the CLI's global model choice anyway.
+
+
+   If you set `LITELLM_MASTER_KEY` for the proxy (see `.env.template` for details), pass it as the Anthropic API key for the CLI:
+   ```bash
+   ANTHROPIC_API_KEY="<LITELLM_MASTER_KEY>" \
+   ANTHROPIC_BASE_URL=http://localhost:4000 \
+   claude
+   ```
+   > **NOTE:** In this case, if you've previously authenticated, run `claude /logout` first.
 
 4. **That's it!** Your Claude Code client will now use the selected **GPT-5 variant(s)** with your chosen reasoning effort level(s). 🎯
 

@@ -23,16 +23,26 @@ ghcr.io/teremterem/claude-code-gpt-5:latest
    ```dotenv
    OPENAI_API_KEY=your-openai-api-key-here
 
+   # Optional (see .env.template for details):
+   # LITELLM_MASTER_KEY=your-master-key-here
+
    # More settings (see .env.template for details)
    ...
    ```
 
 3. **Run the deployment script:**
+
+   Run in the foreground:
+   ```bash
+   ./run-docker.sh
+   ```
+
+   Alternatively, to run in the background:
    ```bash
    ./deploy-docker.sh
    ```
 
-4. **Check the logs:**
+4. **Check the logs** (if you ran in the background):
    ```bash
    docker logs -f claude-code-gpt-5
    ```
@@ -42,12 +52,16 @@ ghcr.io/teremterem/claude-code-gpt-5:latest
 1. **Export your OpenAI API key as an env var**, as well as any other vars from `.env.template` if you would like to modify the defaults (our default Compose setup DOES NOT load env vars from `.env`):
    ```bash
    export OPENAI_API_KEY=your-openai-api-key-here
+
+   # Optional (see .env.template for details):
+   # export LITELLM_MASTER_KEY=your-master-key-here
    ```
 
 2. **Start the service:**
    ```bash
    docker-compose up -d
    ```
+   > **NOTE:** To run in the foreground, remove the `-d` flag.
 
 3. **Check the logs:**
    ```bash
@@ -65,6 +79,9 @@ ghcr.io/teremterem/claude-code-gpt-5:latest
    ```dotenv
    OPENAI_API_KEY=your-openai-api-key-here
 
+   # Optional (see .env.template for details):
+   # LITELLM_MASTER_KEY=your-master-key-here
+
    # More settings (see .env.template for details)
    ...
    ```
@@ -72,14 +89,16 @@ ghcr.io/teremterem/claude-code-gpt-5:latest
 3. **Run the container:**
    ```bash
    docker run -d \
-   --name claude-code-gpt-5 \
-   -p 4000:4000 \
-   --env-file .env \
-   --restart unless-stopped \
-   ghcr.io/teremterem/claude-code-gpt-5:latest
+     --name claude-code-gpt-5 \
+     -p 4000:4000 \
+     --env-file .env \
+     --restart unless-stopped \
+     ghcr.io/teremterem/claude-code-gpt-5:latest
    ```
 
    > **NOTE:** You can also supply the environment variables individually via the `-e` parameter, instead of `--env-file .env`
+
+   > **NOTE:** To run in the foreground, remove the `-d` flag.
 
 4. **Check the logs:**
    ```bash
@@ -99,6 +118,14 @@ Once the proxy is running, use it with Claude Code:
    ```bash
    ANTHROPIC_BASE_URL=http://localhost:4000 claude
    ```
+
+   **If you set a master key, pass it as the Anthropic API key for the CLI:**
+   ```bash
+   ANTHROPIC_API_KEY="<LITELLM_MASTER_KEY>" \
+   ANTHROPIC_BASE_URL=http://localhost:4000 \
+   claude
+   ```
+   > **NOTE:** In the latter case, if you've previously authenticated, run `claude /logout` first.
 
 ## 📊 Monitoring
 
@@ -157,17 +184,20 @@ If you need to build the image yourself.
      --restart unless-stopped \
      claude-code-gpt-5
    ```
+   > **NOTE:** To run in the foreground, remove the `-d` flag.
 
 ### Docker Compose build
 
 Build and run, but overlay with the dev version of Compose setup:
 ```bash
-docker-compose -f docker-compose.dev.yml up -d --build
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build
 ```
 
 This will also map the current directory to the container.
 
 > **NOTE:** The dev version of the Compose setup DOES use the `.env` file, so you will need to set up your environment variables in `.env`
+
+> **NOTE:** To run in the foreground, remove the `-d` flag.
 
 ## 🔧 Troubleshooting
 
