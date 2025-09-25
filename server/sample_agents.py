@@ -1,4 +1,7 @@
 # pylint: disable=too-many-positional-arguments,too-many-locals
+"""
+TODO Docstring
+"""
 from typing import AsyncGenerator, Callable, Generator, Optional, Union
 
 import httpx
@@ -17,7 +20,11 @@ _YODA_SYSTEM_PROMPT = {
 }
 
 
-class YodaLiteLLMCompletions(CustomLLM):
+class YodaLLM(CustomLLM):
+    """
+    TODO Docstring
+    """
+
     def completion(
         self,
         model: str,
@@ -179,4 +186,4 @@ class YodaLiteLLMCompletions(CustomLLM):
             raise ServerError(e) from e
 
 
-yoda_litellm_completions = YodaLiteLLMCompletions()
+yoda_llm = YodaLLM()

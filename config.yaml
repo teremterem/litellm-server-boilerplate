@@ -1,9 +1,9 @@
 model_list:
-  - model_name: "*"
+  - model_name: "yoda_litellm_completions"
     litellm_params:
-      model: "custom_llm_router/*"
+      model: "yoda/litellm_completions"
 
 litellm_settings:
   custom_provider_map:
-  - provider: custom_llm_router
-    custom_handler: proxy.custom_llm_router.custom_llm_router
+  - provider: yoda
+    custom_handler: server.sample_agents.yoda_llm

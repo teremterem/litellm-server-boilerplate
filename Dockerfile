@@ -1,7 +1,8 @@
 FROM python:3.13-slim
 
-LABEL org.opencontainers.image.source=https://github.com/teremterem/claude-code-gpt-5 \
-      org.opencontainers.image.description="Connect Claude Code CLI to GPT-5" \
+# TODO Mention in the docs that the values below need to be changed
+LABEL org.opencontainers.image.source=https://github.com/teremterem/litellm-server-boilerplate \
+      org.opencontainers.image.description="LiteLLM Server Boilerplate" \
       org.opencontainers.image.licenses=MIT
 
 # Set working directory

@@ -1,13 +1,15 @@
-# Docker Deployment Guide for Claude Code GPT-5 Proxy
+# Docker Deployment Guide for LiteLLM Server
 
-This guide explains how to deploy the Claude Code GPT-5 proxy using Docker and GitHub Container Registry (GHCR).
+TODO Make sure this guide is fully updated
+
+This guide explains how to deploy the LiteLLM Server using Docker and GitHub Container Registry (GHCR).
 
 ## 🐳 Docker Image
 
-The Docker image is available in GitHub Container Registry:
+The Docker image is available in a registry:
 
 ```
-ghcr.io/teremterem/claude-code-gpt-5:latest
+ghcr.io/teremterem/litellm-server-boilerplate:latest
 ```
 
 ## 🚀 Quick Start
@@ -19,7 +21,7 @@ ghcr.io/teremterem/claude-code-gpt-5:latest
    cp .env.template .env
    ```
 
-2. **Edit `.env` and add your OpenAI API key:**
+2. **Edit `.env` and add your API keys:**
    ```dotenv
    OPENAI_API_KEY=your-openai-api-key-here
 
@@ -44,12 +46,12 @@ ghcr.io/teremterem/claude-code-gpt-5:latest
 
 4. **Check the logs** (if you ran in the background):
    ```bash
-   docker logs -f claude-code-gpt-5
+   docker logs -f litellm-server-boilerplate
    ```
 
 ### Method 2: Using Docker Compose
 
-1. **Export your OpenAI API key as an env var**, as well as any other vars from `.env.template` if you would like to modify the defaults (our default Compose setup DOES NOT load env vars from `.env`):
+1. **Export your API keys as env vars**, as well as any other vars from `.env.template` if you would like to modify the defaults (our default Compose setup DOES NOT load env vars from `.env`):
    ```bash
    export OPENAI_API_KEY=your-openai-api-key-here
 
@@ -75,7 +77,7 @@ ghcr.io/teremterem/claude-code-gpt-5:latest
    cp .env.template .env
    ```
 
-2. **Edit `.env` and add your OpenAI API key:**
+2. **Edit `.env` and add your API keys:**
    ```dotenv
    OPENAI_API_KEY=your-openai-api-key-here
 
@@ -89,11 +91,11 @@ ghcr.io/teremterem/claude-code-gpt-5:latest
 3. **Run the container:**
    ```bash
    docker run -d \
-     --name claude-code-gpt-5 \
+     --name litellm-server-boilerplate \
      -p 4000:4000 \
      --env-file .env \
      --restart unless-stopped \
-     ghcr.io/teremterem/claude-code-gpt-5:latest
+     ghcr.io/teremterem/litellm-server-boilerplate:latest
    ```
 
    > **NOTE:** To run in the foreground, remove the `-d` flag.
@@ -102,53 +104,31 @@ ghcr.io/teremterem/claude-code-gpt-5:latest
 
 4. **Check the logs:**
    ```bash
-   docker logs -f claude-code-gpt-5
+   docker logs -f litellm-server-boilerplate
    ```
-
-## 🔧 Usage with Claude Code
-
-Once the proxy is running, use it with Claude Code:
-
-1. **Install Claude Code** (if not already installed):
-   ```bash
-   npm install -g @anthropic-ai/claude-code
-   ```
-
-2. **Use with GPT-5 via the proxy:**
-   ```bash
-   ANTHROPIC_BASE_URL=http://localhost:4000 claude
-   ```
-
-   **If you set a master key, pass it as the Anthropic API key for the CLI:**
-   ```bash
-   ANTHROPIC_API_KEY="<LITELLM_MASTER_KEY>" \
-   ANTHROPIC_BASE_URL=http://localhost:4000 \
-   claude
-   ```
-   > **NOTE:** In the latter case, if you've previously authenticated, run `claude /logout` first.
 
 ## 📊 Monitoring
 
 ### Check container status:
 ```bash
-docker ps | grep claude-code-gpt-5
+docker ps | grep litellm-server-boilerplate
 ```
 
 ### Monitor resource usage:
 ```bash
-docker stats claude-code-gpt-5
+docker stats litellm-server-boilerplate
 ```
 
 ## 🛑 Stopping and Cleanup
 
 ### Stop the container:
 ```bash
-docker stop claude-code-gpt-5
+docker stop litellm-server-boilerplate
 ```
 
 ### Remove the container:
 ```bash
-docker rm claude-code-gpt-5
+docker rm litellm-server-boilerplate
 ```
 
 > **NOTE:** `./stop-docker.sh` can be used to both stop and remove the container in one go.
@@ -174,17 +154,17 @@ If you need to build the image yourself.
 
 1. First build the image:
    ```bash
-   docker build -t claude-code-gpt-5 .
+   docker build -t litellm-server-boilerplate .
    ```
 
 2. Then run the container:
    ```bash
    docker run -d \
-     --name claude-code-gpt-5 \
+     --name litellm-server-boilerplate \
      -p 4000:4000 \
      --env-file .env \
      --restart unless-stopped \
-     claude-code-gpt-5
+     litellm-server-boilerplate
    ```
    > **NOTE:** To run in the foreground, remove the `-d` flag.
 
@@ -206,15 +186,14 @@ This will also map the current directory to the container.
 ### Container won't start
 1. Check if port 4000 is available: `lsof -i :4000`
 2. Verify environment variables are set correctly
-3. Check container logs: `docker logs -f claude-code-gpt-5`
+3. Check container logs: `docker logs -f litellm-server-boilerplate`
 
 ### Authentication issues
 1. Verify your API keys are valid and have sufficient credits
-2. Check if OpenAI requires identity verification for GPT-5 access (see [README.md](README.md), section "First time using GPT-5 via API?")
 
 ### Performance issues
 1. Ensure sufficient memory is available (recommended: 2GB+)
-2. Check network connectivity to OpenAI and Anthropic APIs
+2. Check network connectivity to the APIs
 
 ## 🔐 Security Notes
 
@@ -222,11 +201,3 @@ This will also map the current directory to the container.
 - Use environment variables or Docker secrets for sensitive data
 - Consider running the container in a restricted network environment
 - Regularly update the image to get security patches
-
-## 📝 Architecture
-
-```
-Claude Code CLI → LiteLLM Proxy (Port 4000) → OpenAI GPT-5 API
-```
-
-The proxy handles model routing and ensures compatibility between Claude Code's expectations and OpenAI's GPT-5 responses.

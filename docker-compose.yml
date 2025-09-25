@@ -1,20 +1,13 @@
 services:
-  claude-code-gpt-5:
-    image: ghcr.io/teremterem/claude-code-gpt-5:latest
-    container_name: claude-code-gpt-5
+  litellm-server:
+    # TODO Mention in the docs that the image and thecontainer name below need to be changed
+    image: ghcr.io/teremterem/litellm-server-boilerplate:latest
+    container_name: litellm-server-boilerplate
     ports:
       - "4000:4000"
     restart: unless-stopped
     environment:
+      - LITELLM_MASTER_KEY
       - OPENAI_API_KEY
       - ANTHROPIC_API_KEY
-      - LITELLM_MASTER_KEY
-      - REMAP_CLAUDE_HAIKU_TO
-      - REMAP_CLAUDE_SONNET_TO
-      - REMAP_CLAUDE_OPUS_TO
-      - OPENAI_BASE_URL
-      - ANTHROPIC_BASE_URL
-      - ENFORCE_ONE_TOOL_CALL_PER_RESPONSE
-      - LANGFUSE_SECRET_KEY
-      - LANGFUSE_PUBLIC_KEY
-      - LANGFUSE_HOST
+      # TODO Mention in the docs that all the supported env vars need to be listed

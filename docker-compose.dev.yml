@@ -1,8 +1,9 @@
 # Meant to be overlaid on top of docker-compose.yml
 services:
-  claude-code-gpt-5:
+  litellm-server:
     build: .
-    image: claude-code-gpt-5:dev
+    # TODO Mention in the docs that the name below need to be changed
+    image: litellm-server-boilerplate:dev
     volumes:
       - .:/app
       - app-venv:/app/.venv

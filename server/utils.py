@@ -17,7 +17,7 @@ def to_generic_streaming_chunk(chunk: Any) -> GenericStreamingChunk:
     """
     Best-effort convert a LiteLLM ModelResponseStream chunk into GenericStreamingChunk.
 
-    NOTE: This function was vibe-coded without any review.
+    NOTE: As a "low-stakes" utility, this function was vibe-coded without review.
 
     GenericStreamingChunk TypedDict keys:
       - text: str (required)

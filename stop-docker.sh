@@ -1,19 +1,20 @@
 #!/bin/bash
 
-# Stop claude-code-gpt-5 Docker container
+# Stop and remove the LiteLLM Server Docker container
 
 set -e
 
-PROXY_CONTAINER_NAME="${PROXY_CONTAINER_NAME:-claude-code-gpt-5}"
+# TODO Mention in the docs that the name below needs to be changed
+LITELLM_SERVER_CONTAINER_NAME="${LITELLM_SERVER_CONTAINER_NAME:-litellm-server-boilerplate}"
 
-echo "❌ Stopping Claude Code GPT-5 Proxy..."
+echo "❌ Stopping LiteLLM Server..."
 
-if docker ps -a --format 'table {{.Names}}' | grep -q "^${PROXY_CONTAINER_NAME}$"; then
+if docker ps -a --format 'table {{.Names}}' | grep -q "^${LITELLM_SERVER_CONTAINER_NAME}$"; then
     echo "📦 Stopping container..."
-    docker stop ${PROXY_CONTAINER_NAME} || true
+    docker stop ${LITELLM_SERVER_CONTAINER_NAME} || true
     echo "🗑️  Removing container..."
-    docker rm ${PROXY_CONTAINER_NAME} || true
-    echo "✅ ${PROXY_CONTAINER_NAME} stopped and removed."
+    docker rm ${LITELLM_SERVER_CONTAINER_NAME} || true
+    echo "✅ ${LITELLM_SERVER_CONTAINER_NAME} stopped and removed."
 else
-    echo "ℹ️  No container named ${PROXY_CONTAINER_NAME} found."
+    echo "ℹ️  No container named ${LITELLM_SERVER_CONTAINER_NAME} found."
 fi

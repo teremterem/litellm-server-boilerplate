@@ -2,6 +2,7 @@
 line-length = 119
 
 [project]
+# TODO Mention in the docs that the project name below needs to be changed
 name = "litellm-server-boilerplate"
 version = "0.1.0"
 description = "TODO"
