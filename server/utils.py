@@ -3,8 +3,21 @@ from typing import Any, Optional
 from litellm import GenericStreamingChunk
 
 
+class ServerError(RuntimeError):
+    def __init__(self, error: BaseException | str, highlight: bool = True):
+        if highlight:
+            # Highlight error messages in red, so the actual problems are
+            # easier to spot in long tracebacks
+            super().__init__(f"\033[1;31m{error}\033[0m")
+        else:
+            super().__init__(error)
+
+
 def to_generic_streaming_chunk(chunk: Any) -> GenericStreamingChunk:
-    """Best-effort convert a LiteLLM ModelResponseStream chunk into GenericStreamingChunk.
+    """
+    Best-effort convert a LiteLLM ModelResponseStream chunk into GenericStreamingChunk.
+
+    NOTE: This function was vibe-coded without any review.
 
     GenericStreamingChunk TypedDict keys:
       - text: str (required)
@@ -15,7 +28,6 @@ def to_generic_streaming_chunk(chunk: Any) -> GenericStreamingChunk:
       - tool_use: Optional[ChatCompletionToolCallChunk] (default None)
       - provider_specific_fields: Optional[dict]
     """
-    # We don't really care about the readability of this function - it was vibe-coded without review
     # pylint: disable=too-many-locals,too-many-branches,too-many-statements
 
     # Defaults
