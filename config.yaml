@@ -1,0 +1,9 @@
+model_list:
+  - model_name: "yoda_litellm_completions"
+    litellm_params:
+      model: "yoda/litellm_completions"
+
+litellm_settings:
+  custom_provider_map:
+  - provider: yoda
+    custom_handler: server.sample_agents.yoda_llm

@@ -1,0 +1,16 @@
+# Meant to be overlaid on top of docker-compose.yml
+services:
+  litellm-server:
+    build: .
+    # TODO Mention in the docs that the name below need to be changed
+    image: litellm-server-boilerplate:dev
+    volumes:
+      - .:/app
+      - app-venv:/app/.venv
+      - uv-cache:/root/.cache/uv  # To boost performance of `uv sync` operation
+    env_file:
+      - .env
+
+volumes:
+  app-venv:
+  uv-cache:
