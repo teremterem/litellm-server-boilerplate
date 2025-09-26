@@ -9,7 +9,7 @@ import httpx
 import litellm
 from litellm import CustomLLM, GenericStreamingChunk, HTTPHandler, ModelResponse, AsyncHTTPHandler
 
-from server.utils import ServerError, to_generic_streaming_chunk
+from server.utils import ServerError, to_generic_streaming_chunk, to_responses_input
 
 
 _YODA_SYSTEM_PROMPT = {
@@ -61,16 +61,9 @@ class YodaLLM(CustomLLM):
                 print("RESPONSES RESPONSES RESPONSES RESPONSES RESPONSES")
                 print(f"RESPONSES RESPONSES {model} RESPONSES RESPONSES")
                 print("RESPONSES RESPONSES RESPONSES RESPONSES RESPONSES")
-
-                for message in messages:
-                    for content in message.get("content") or []:
-                        if content.get("type") == "text":
-                            content["type"] = "input_text"
-                            # TODO Replace other types of content too
-
                 response = litellm.responses(  # TODO Check all params are supported
                     model=self.target_model,
-                    input=messages,
+                    input=to_responses_input(messages),
                     logger_fn=logger_fn,
                     headers=headers or {},
                     timeout=timeout,
@@ -127,16 +120,9 @@ class YodaLLM(CustomLLM):
                 print("RESPONSES RESPONSES RESPONSES RESPONSES RESPONSES")
                 print(f"RESPONSES RESPONSES {model} RESPONSES RESPONSES")
                 print("RESPONSES RESPONSES RESPONSES RESPONSES RESPONSES")
-
-                for message in messages:
-                    for content in message.get("content") or []:
-                        if content.get("type") == "text":
-                            content["type"] = "input_text"
-                            # TODO Replace other types of content too
-
                 response = await litellm.responses(  # TODO Check all params are supported
                     model=self.target_model,
-                    input=messages,
+                    input=to_responses_input(messages),
                     logger_fn=logger_fn,
                     headers=headers or {},
                     timeout=timeout,
@@ -194,16 +180,9 @@ class YodaLLM(CustomLLM):
                 print("RESPONSES RESPONSES RESPONSES RESPONSES RESPONSES")
                 print(f"RESPONSES RESPONSES {model} RESPONSES RESPONSES")
                 print("RESPONSES RESPONSES RESPONSES RESPONSES RESPONSES")
-
-                for message in messages:
-                    for content in message.get("content") or []:
-                        if content.get("type") == "text":
-                            content["type"] = "input_text"
-                            # TODO Replace other types of content too
-
                 response = litellm.responses(  # TODO Check all params are supported
                     model=self.target_model,
-                    input=messages,
+                    input=to_responses_input(messages),
                     logger_fn=logger_fn,
                     headers=headers or {},
                     timeout=timeout,
@@ -263,16 +242,9 @@ class YodaLLM(CustomLLM):
                 print("RESPONSES RESPONSES RESPONSES RESPONSES RESPONSES")
                 print(f"RESPONSES RESPONSES {model} RESPONSES RESPONSES")
                 print("RESPONSES RESPONSES RESPONSES RESPONSES RESPONSES")
-
-                for message in messages:
-                    for content in message.get("content") or []:
-                        if content.get("type") == "text":
-                            content["type"] = "input_text"
-                            # TODO Replace other types of content too
-
                 response = await litellm.responses(  # TODO Check all params are supported
                     model=self.target_model,
-                    input=messages,
+                    input=to_responses_input(messages),
                     logger_fn=logger_fn,
                     headers=headers or {},
                     timeout=timeout,

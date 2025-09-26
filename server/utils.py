@@ -1,16 +1,83 @@
-from typing import Any, Optional
+import json
+from typing import Any, Optional, Union
 
 from litellm import GenericStreamingChunk
 
 
 class ServerError(RuntimeError):
-    def __init__(self, error: BaseException | str, highlight: bool = True):
+    def __init__(self, error: Union[BaseException, str], highlight: bool = True):
         if highlight:
             # Highlight error messages in red, so the actual problems are
             # easier to spot in long tracebacks
             super().__init__(f"\033[1;31m{error}\033[0m")
         else:
             super().__init__(error)
+
+
+def to_responses_input(messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    input_items: list[dict[str, Any]] = []
+
+    def norm_parts(content: Union[str, list[dict[str, Any]]]) -> list[dict[str, Any]]:
+        if isinstance(content, str):
+            return [{"type": "text", "text": content}]
+        parts: list[dict[str, Any]] = []
+        for p in content:
+            t = p.get("type")
+            if t == "text":
+                parts.append({"type": "text", "text": p.get("text", "")})
+            elif t == "image_url":
+                url = p.get("image_url", {}).get("url") or p.get("image_url")
+                if url:
+                    parts.append({"type": "input_image", "image_url": url})
+            else:
+                # Pass through unknown parts as text to be safe
+                parts.append({"type": "text", "text": str(p)})
+        return parts
+
+    for m in messages:
+        role = m.get("role")
+        content = m.get("content", "")
+
+        # Assistant message may have tool_calls
+        tool_calls = m.get("tool_calls")
+        if role in ("system", "user", "assistant"):
+            parts = norm_parts(content)
+            if parts:
+                input_items.append({"role": role, "content": parts})
+
+            # Convert assistant tool calls (if any)
+            if role == "assistant" and tool_calls:
+                for tc in tool_calls:
+                    fc = tc.get("function", {}) or {}
+                    args = fc.get("arguments")
+                    try:
+                        args_obj = json.loads(args) if isinstance(args, str) else args
+                    except Exception:  # pylint: disable=broad-exception-caught
+                        args_obj = args
+                    input_items.append(
+                        {
+                            "type": "function_call",
+                            "name": fc.get("name"),
+                            "call_id": tc.get("id"),  # keep the original id for later outputs
+                            "arguments": args_obj or {},
+                        }
+                    )
+
+        # Tool outputs become function_call_output items
+        elif role == "tool":
+            call_id = m.get("tool_call_id")
+            output_text = content if isinstance(content, str) else json.dumps(content)
+            input_items.append(
+                {
+                    "type": "function_call_output",
+                    "call_id": call_id,
+                    "output": output_text,
+                }
+            )
+
+        # Ignore function role (legacy) or unknown roles for simplicity
+
+    return input_items
 
 
 def to_generic_streaming_chunk(chunk: Any) -> GenericStreamingChunk:
