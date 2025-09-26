@@ -9,7 +9,7 @@ custom:
       # More or less this is "irrelevant", you can pick any model. Just pick one you have defined in LiteLLM.
       models:
         default: ["YodaSpeak"]
-        fetch: true
+        fetch: false
       titleConvo: true
       titleModel: "openai/gpt-4o-mini"
       summarize: false
