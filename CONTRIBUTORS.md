@@ -12,5 +12,5 @@ This project exists thanks to the following people who have contributed code, do
 
 ## Notes
 
-- Contributions are licensed under the MIT License (see LICENSE file).
+- Contributions are licensed under the MIT License (see [LICENSE](/LICENSE) file).
 - The list above is non-exhaustive. You can also view [the full list of contributors](https://github.com/teremterem/litellm-server-boilerplate/graphs/contributors) from GitHub’s contributor graph.
