@@ -97,7 +97,7 @@ OpenAI/Anthropic API compatible clients (LibreChat etc.)
  ↓
 LiteLLM Server (Port 4000)
  ↓
- Your custom agents
+Your custom agents
 ```
 
 ## P. S. You are welcome to join our [MiniAgents Discord Server 👥](https://discord.gg/ptSvVnbwKt)
