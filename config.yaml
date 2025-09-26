@@ -5,7 +5,7 @@ model_list:
 
   - model_name: "yoda/litellm-responses"
     litellm_params:
-      model: "yoda/litellm-completions"
+      model: "yoda/litellm-responses"
 
 litellm_settings:
   custom_provider_map:
