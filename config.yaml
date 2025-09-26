@@ -1,7 +1,7 @@
 model_list:
-  - model_name: "yoda_litellm_completions"
+  - model_name: "yoda-litellm-completions"
     litellm_params:
-      model: "yoda/litellm_completions"
+      model: "yoda/litellm-completions"
 
 litellm_settings:
   custom_provider_map:

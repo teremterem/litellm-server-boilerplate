@@ -2,7 +2,7 @@
 """
 TODO Docstring
 """
-from typing import AsyncGenerator, Callable, Generator, Optional, Union
+from typing import Any, AsyncGenerator, Callable, Generator, Optional, Union
 
 import httpx
 import litellm
@@ -25,6 +25,10 @@ class YodaLLM(CustomLLM):
     TODO Docstring
     """
 
+    def __init__(self, *, target_model: str = "openai/gpt-4o-mini", **kwargs: Any) -> None:
+        super().__init__(**kwargs)
+        self.target_model = target_model
+
     def completion(
         self,
         model: str,
@@ -45,11 +49,13 @@ class YodaLLM(CustomLLM):
         client: Optional[HTTPHandler] = None,
     ) -> ModelResponse:
         try:
+            optional_params.pop("max_tokens", None)  # TODO Get rid of this line ?
+
             # For Langfuse
-            optional_params.setdefault("metadata", {})["trace_name"] = "OUTBOUND-from-completion"
+            optional_params.setdefault("metadata", {}).setdefault("trace_name", "OUTBOUND-from-completion")
 
             response = litellm.completion(
-                model=model,
+                model=self.target_model,
                 messages=messages + [_YODA_SYSTEM_PROMPT],
                 logger_fn=logger_fn,
                 headers=headers or {},
@@ -83,11 +89,13 @@ class YodaLLM(CustomLLM):
         client: Optional[AsyncHTTPHandler] = None,
     ) -> ModelResponse:
         try:
+            optional_params.pop("max_tokens", None)  # TODO Get rid of this line ?
+
             # For Langfuse
-            optional_params.setdefault("metadata", {})["trace_name"] = "OUTBOUND-from-acompletion"
+            optional_params.setdefault("metadata", {}).setdefault("trace_name", "OUTBOUND-from-acompletion")
 
             response = await litellm.acompletion(
-                model=model,
+                model=self.target_model,
                 messages=messages + [_YODA_SYSTEM_PROMPT],
                 logger_fn=logger_fn,
                 headers=headers or {},
@@ -121,13 +129,14 @@ class YodaLLM(CustomLLM):
         client: Optional[HTTPHandler] = None,
     ) -> Generator[GenericStreamingChunk, None, None]:
         try:
+            optional_params.pop("max_tokens", None)  # TODO Get rid of this line ?
             optional_params["stream"] = True
 
             # For Langfuse
-            optional_params.setdefault("metadata", {})["trace_name"] = "OUTBOUND-from-streaming"
+            optional_params.setdefault("metadata", {}).setdefault("trace_name", "OUTBOUND-from-streaming")
 
             response = litellm.completion(
-                model=model,
+                model=self.target_model,
                 messages=messages + [_YODA_SYSTEM_PROMPT],
                 logger_fn=logger_fn,
                 headers=headers or {},
@@ -163,13 +172,14 @@ class YodaLLM(CustomLLM):
         client: Optional[AsyncHTTPHandler] = None,
     ) -> AsyncGenerator[GenericStreamingChunk, None]:
         try:
+            optional_params.pop("max_tokens", None)  # TODO Get rid of this line ?
             optional_params["stream"] = True
 
             # For Langfuse
-            optional_params.setdefault("metadata", {})["trace_name"] = "OUTBOUND-from-astreaming"
+            optional_params.setdefault("metadata", {}).setdefault("trace_name", "OUTBOUND-from-astreaming")
 
             response = await litellm.acompletion(
-                model=model,
+                model=self.target_model,
                 messages=messages + [_YODA_SYSTEM_PROMPT],
                 logger_fn=logger_fn,
                 headers=headers or {},
