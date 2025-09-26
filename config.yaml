@@ -1,5 +1,9 @@
 model_list:
-  - model_name: "yoda-litellm-completions"
+  - model_name: "yoda/litellm-completions"
+    litellm_params:
+      model: "yoda/litellm-completions"
+
+  - model_name: "yoda/litellm-responses"
     litellm_params:
       model: "yoda/litellm-completions"
 
