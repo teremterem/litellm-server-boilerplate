@@ -2,6 +2,7 @@
 """
 TODO Docstring
 """
+from pprint import pprint
 from typing import Any, AsyncGenerator, Callable, Generator, Optional, Union
 
 import httpx
@@ -49,6 +50,7 @@ class YodaLLM(CustomLLM):
         client: Optional[HTTPHandler] = None,
     ) -> ModelResponse:
         try:
+            pprint(messages, width=160)
             messages = messages + [_YODA_SYSTEM_PROMPT]
             optional_params.pop("max_tokens", None)  # TODO Get rid of this line ?
 
@@ -61,9 +63,10 @@ class YodaLLM(CustomLLM):
                 print("RESPONSES RESPONSES RESPONSES RESPONSES RESPONSES")
 
                 for message in messages:
-                    if "text" in message:
-                        message["input_text"] = message["text"]
-                        del message["text"]
+                    for content in message.get("content") or []:
+                        if content.get("type") == "text":
+                            content["type"] = "input_text"
+                            # TODO Replace other types of content too
 
                 response = litellm.responses(  # TODO Check all params are supported
                     model=self.target_model,
@@ -113,6 +116,7 @@ class YodaLLM(CustomLLM):
         client: Optional[AsyncHTTPHandler] = None,
     ) -> ModelResponse:
         try:
+            pprint(messages, width=160)
             messages = messages + [_YODA_SYSTEM_PROMPT]
             optional_params.pop("max_tokens", None)  # TODO Get rid of this line ?
 
@@ -125,9 +129,10 @@ class YodaLLM(CustomLLM):
                 print("RESPONSES RESPONSES RESPONSES RESPONSES RESPONSES")
 
                 for message in messages:
-                    if "text" in message:
-                        message["input_text"] = message["text"]
-                        del message["text"]
+                    for content in message.get("content") or []:
+                        if content.get("type") == "text":
+                            content["type"] = "input_text"
+                            # TODO Replace other types of content too
 
                 response = await litellm.responses(  # TODO Check all params are supported
                     model=self.target_model,
@@ -177,6 +182,7 @@ class YodaLLM(CustomLLM):
         client: Optional[HTTPHandler] = None,
     ) -> Generator[GenericStreamingChunk, None, None]:
         try:
+            pprint(messages, width=160)
             messages = messages + [_YODA_SYSTEM_PROMPT]
             optional_params.pop("max_tokens", None)  # TODO Get rid of this line ?
             optional_params["stream"] = True
@@ -190,9 +196,10 @@ class YodaLLM(CustomLLM):
                 print("RESPONSES RESPONSES RESPONSES RESPONSES RESPONSES")
 
                 for message in messages:
-                    if "text" in message:
-                        message["input_text"] = message["text"]
-                        del message["text"]
+                    for content in message.get("content") or []:
+                        if content.get("type") == "text":
+                            content["type"] = "input_text"
+                            # TODO Replace other types of content too
 
                 response = litellm.responses(  # TODO Check all params are supported
                     model=self.target_model,
@@ -244,6 +251,7 @@ class YodaLLM(CustomLLM):
         client: Optional[AsyncHTTPHandler] = None,
     ) -> AsyncGenerator[GenericStreamingChunk, None]:
         try:
+            pprint(messages, width=160)
             messages = messages + [_YODA_SYSTEM_PROMPT]
             optional_params.pop("max_tokens", None)  # TODO Get rid of this line ?
             optional_params["stream"] = True
@@ -257,9 +265,10 @@ class YodaLLM(CustomLLM):
                 print("RESPONSES RESPONSES RESPONSES RESPONSES RESPONSES")
 
                 for message in messages:
-                    if "text" in message:
-                        message["input_text"] = message["text"]
-                        del message["text"]
+                    for content in message.get("content") or []:
+                        if content.get("type") == "text":
+                            content["type"] = "input_text"
+                            # TODO Replace other types of content too
 
                 response = await litellm.responses(  # TODO Check all params are supported
                     model=self.target_model,
