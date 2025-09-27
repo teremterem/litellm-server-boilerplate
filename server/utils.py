@@ -1,11 +1,11 @@
 from copy import deepcopy
-from typing import Any, Optional
+from typing import Any, Optional, Union
 
 from litellm import GenericStreamingChunk
 
 
 class ServerError(RuntimeError):
-    def __init__(self, error: BaseException | str, highlight: bool = True):
+    def __init__(self, error: Union[BaseException, str], highlight: bool = True):
         if highlight:
             # Highlight error messages in red, so the actual problems are
             # easier to spot in long tracebacks
@@ -245,6 +245,47 @@ _TOOL_TYPE_ALIASES = {
 }
 
 
+_CONTENT_KEYS_TO_DROP = {"cache_control"}
+
+_FUNCTION_METADATA_KEYS = ("description", "parameters", "strict")
+
+
+def convert_chat_params_to_responses(optional_params: dict[str, Any]) -> dict[str, Any]:
+    """Return a copy of optional params adjusted for the Responses API."""
+
+    if optional_params is None:
+        return {}
+    if not isinstance(optional_params, dict):
+        raise TypeError("optional_params must be a dictionary when targeting the Responses API")
+
+    params = deepcopy(optional_params)
+
+    tools = params.get("tools")
+    if tools is not None:
+        converted_tools = _convert_tools_list(tools)
+        if converted_tools:
+            params["tools"] = converted_tools
+        else:
+            params.pop("tools", None)
+
+    functions = params.pop("functions", None)
+    if functions:
+        function_tools = _convert_functions_list(functions)
+        if function_tools:
+            params.setdefault("tools", [])
+            params["tools"].extend(function_tools)
+
+    tool_choice = params.get("tool_choice")
+    if tool_choice is not None:
+        converted_choice = _convert_tool_choice(tool_choice)
+        if converted_choice is None:
+            params.pop("tool_choice", None)
+        else:
+            params["tool_choice"] = converted_choice
+
+    return params
+
+
 def convert_chat_messages_to_responses_items(messages: list[Any]) -> list[dict[str, Any]]:
     """Convert Chat Completions style messages into Responses API compatible items."""
 
@@ -297,6 +338,9 @@ def _convert_content_part(role: str, part: Any) -> dict[str, Any]:
         return {"type": _default_content_type_for_role(role), "text": str(part)}
 
     new_part = deepcopy(part)
+    for key in list(new_part):
+        if key in _CONTENT_KEYS_TO_DROP:
+            new_part.pop(key, None)
     part_type = new_part.get("type")
     normalized_type = _normalize_type_by_role(role, part_type)
     if normalized_type is not None:
@@ -336,6 +380,116 @@ def _convert_content_part(role: str, part: Any) -> dict[str, Any]:
         new_part["file_id"] = new_part.pop("file")
 
     return new_part
+
+
+def _convert_tools_list(tools: Any) -> list[dict[str, Any]]:
+    if tools is None:
+        return []
+
+    if isinstance(tools, dict):
+        iterable = [tools]
+    elif isinstance(tools, list):
+        iterable = tools
+    else:
+        raise TypeError("tools must be a list or dict when targeting the Responses API")
+
+    converted: list[dict[str, Any]] = []
+    for idx, tool in enumerate(iterable):
+        if not isinstance(tool, dict):
+            raise TypeError(f"tool definition at index {idx} must be a mapping")
+
+        # Already Responses format
+        if tool.get("type") == "function" and "function" not in tool:
+            name = tool.get("name")
+            if isinstance(name, str) and name:
+                converted.append(deepcopy(tool))
+            continue
+
+        if tool.get("type") == "function" or "function" in tool:
+            fn_payload = tool.get("function") if isinstance(tool.get("function"), dict) else {}
+            name = fn_payload.get("name") or tool.get("name")
+            if not isinstance(name, str) or not name:
+                continue
+
+            new_tool = {k: deepcopy(v) for k, v in tool.items() if k not in {"function"}}
+            new_tool["type"] = "function"
+            new_tool["name"] = name
+
+            for key in _FUNCTION_METADATA_KEYS:
+                if key in fn_payload and key not in new_tool:
+                    new_tool[key] = deepcopy(fn_payload[key])
+
+            converted.append(new_tool)
+            continue
+
+        converted.append(deepcopy(tool))
+
+    return converted
+
+
+def _convert_functions_list(functions: Any) -> list[dict[str, Any]]:
+    if functions is None:
+        return []
+
+    if isinstance(functions, dict):
+        iterable = [functions]
+    elif isinstance(functions, list):
+        iterable = functions
+    else:
+        raise TypeError("functions must be a list or dict when targeting the Responses API")
+
+    converted: list[dict[str, Any]] = []
+    for idx, fn in enumerate(iterable):
+        if not isinstance(fn, dict):
+            raise TypeError(f"function definition at index {idx} must be a mapping")
+
+        name = fn.get("name")
+        if not isinstance(name, str) or not name:
+            continue
+
+        tool_def: dict[str, Any] = {"type": "function", "name": name}
+        for key in _FUNCTION_METADATA_KEYS:
+            if key in fn:
+                tool_def[key] = deepcopy(fn[key])
+
+        converted.append(tool_def)
+
+    return converted
+
+
+def _convert_tool_choice(tool_choice: Any) -> Optional[Any]:
+    # pylint: disable=too-many-return-statements
+    if isinstance(tool_choice, str):
+        return tool_choice
+
+    if isinstance(tool_choice, dict):
+        if isinstance(tool_choice.get("function"), dict):
+            fn_payload = tool_choice["function"]
+            name = fn_payload.get("name")
+            if not isinstance(name, str) or not name:
+                return None
+
+            converted = {"type": "function", "name": name}
+            if "arguments" in fn_payload:
+                converted["arguments"] = deepcopy(fn_payload["arguments"])
+            if "output" in fn_payload:
+                converted["output"] = deepcopy(fn_payload["output"])
+            return converted
+
+        if tool_choice.get("type") == "function":
+            name = tool_choice.get("name")
+            if not isinstance(name, str) or not name:
+                return None
+            converted = {"type": "function", "name": name}
+            if "arguments" in tool_choice:
+                converted["arguments"] = deepcopy(tool_choice["arguments"])
+            if "output" in tool_choice:
+                converted["output"] = deepcopy(tool_choice["output"])
+            return converted
+
+        return deepcopy(tool_choice)
+
+    return None
 
 
 def _normalize_type_by_role(role: str, part_type: Any) -> Optional[str]:

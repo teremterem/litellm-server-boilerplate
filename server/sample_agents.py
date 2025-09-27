@@ -8,7 +8,12 @@ import httpx
 import litellm
 from litellm import CustomLLM, GenericStreamingChunk, HTTPHandler, ModelResponse, AsyncHTTPHandler
 
-from server.utils import ServerError, convert_chat_messages_to_responses_items, to_generic_streaming_chunk
+from server.utils import (
+    ServerError,
+    convert_chat_messages_to_responses_items,
+    convert_chat_params_to_responses,
+    to_generic_streaming_chunk,
+)
 
 
 _YODA_SYSTEM_PROMPT = {
@@ -25,7 +30,7 @@ class YodaLLM(CustomLLM):
     TODO Docstring
     """
 
-    def __init__(self, *, target_model: str = "openai/gpt-4o-mini", **kwargs: Any) -> None:
+    def __init__(self, *, target_model: str = "openai/gpt-5-codex", **kwargs: Any) -> None:
         super().__init__(**kwargs)
         self.target_model = target_model
 
@@ -64,7 +69,7 @@ class YodaLLM(CustomLLM):
                     headers=headers or {},
                     timeout=timeout,
                     client=client,
-                    **optional_params,
+                    **convert_chat_params_to_responses(optional_params),
                 )
             elif model == "litellm-completions":
                 print("\033[1m\033[32mLiteLLM ChatCompletions API Request\033[0m")
@@ -121,7 +126,7 @@ class YodaLLM(CustomLLM):
                     headers=headers or {},
                     timeout=timeout,
                     client=client,
-                    **optional_params,
+                    **convert_chat_params_to_responses(optional_params),
                 )
             elif model == "litellm-completions":
                 print("\033[1m\033[32mLiteLLM ChatCompletions API Request\033[0m")
@@ -179,7 +184,7 @@ class YodaLLM(CustomLLM):
                     headers=headers or {},
                     timeout=timeout,
                     client=client,
-                    **optional_params,
+                    **convert_chat_params_to_responses(optional_params),
                 )
             elif model == "litellm-completions":
                 print("\033[1m\033[32mLiteLLM ChatCompletions API Request\033[0m")
@@ -239,7 +244,7 @@ class YodaLLM(CustomLLM):
                     headers=headers or {},
                     timeout=timeout,
                     client=client,
-                    **optional_params,
+                    **convert_chat_params_to_responses(optional_params),
                 )
             elif model == "litellm-completions":
                 print("\033[1m\033[32mLiteLLM ChatCompletions API Request\033[0m")
