@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import Any, Optional
 
 from litellm import GenericStreamingChunk
@@ -200,3 +201,158 @@ def to_generic_streaming_chunk(chunk: Any) -> GenericStreamingChunk:
         "tool_use": tool_use,
         "provider_specific_fields": provider_specific_fields,
     }
+
+
+_INPUT_TYPE_ALIASES = {
+    "text": "input_text",
+    "input_text": "input_text",
+    "image": "input_image",
+    "image_url": "input_image",
+    "image_file": "input_image",
+    "input_image": "input_image",
+    "audio": "input_audio",
+    "audio_url": "input_audio",
+    "input_audio": "input_audio",
+    "video": "input_video",
+    "video_url": "input_video",
+    "input_video": "input_video",
+    "file": "input_file",
+    "document": "input_file",
+    "input_file": "input_file",
+}
+
+
+_OUTPUT_TYPE_ALIASES = {
+    "text": "output_text",
+    "output_text": "output_text",
+    "image": "output_image",
+    "image_url": "output_image",
+    "output_image": "output_image",
+    "audio": "output_audio",
+    "audio_url": "output_audio",
+    "output_audio": "output_audio",
+    "video": "output_video",
+    "video_url": "output_video",
+    "output_video": "output_video",
+}
+
+
+_TOOL_TYPE_ALIASES = {
+    "text": "tool_result",
+    "tool_result": "tool_result",
+    "input_text": "tool_result",
+    "output_text": "tool_result",
+}
+
+
+def convert_chat_messages_to_responses_items(messages: list[Any]) -> list[dict[str, Any]]:
+    """Convert Chat Completions style messages into Responses API compatible items."""
+
+    if not isinstance(messages, list):
+        raise TypeError("messages must be provided as a list")
+
+    converted: list[dict[str, Any]] = []
+    for idx, message in enumerate(messages):
+        if not isinstance(message, dict):
+            raise TypeError(f"Chat message at index {idx} must be a mapping")
+
+        role = message.get("role")
+        if not isinstance(role, str) or not role:
+            raise ValueError(f"Chat message at index {idx} is missing a valid role")
+
+        new_message: dict[str, Any] = {k: deepcopy(v) for k, v in message.items() if k != "content"}
+        content = message.get("content")
+        new_message["content"] = _normalize_message_content(role, content)
+        converted.append(new_message)
+
+    return converted
+
+
+def _normalize_message_content(role: str, content: Any) -> list[Any]:
+    if isinstance(content, str):
+        return [{"type": _default_content_type_for_role(role), "text": content}]
+
+    if isinstance(content, dict):
+        return [_convert_content_part(role, content)]
+
+    if isinstance(content, list):
+        normalized_parts: list[Any] = []
+        for part in content:
+            normalized_parts.append(_convert_content_part(role, part))
+        return normalized_parts
+
+    if content is None:
+        return []
+
+    # Fallback to string representation
+    return [{"type": _default_content_type_for_role(role), "text": str(content)}]
+
+
+def _convert_content_part(role: str, part: Any) -> dict[str, Any]:
+    # pylint: disable=too-many-branches
+    if isinstance(part, str):
+        return {"type": _default_content_type_for_role(role), "text": part}
+
+    if not isinstance(part, dict):
+        return {"type": _default_content_type_for_role(role), "text": str(part)}
+
+    new_part = deepcopy(part)
+    part_type = new_part.get("type")
+    normalized_type = _normalize_type_by_role(role, part_type)
+    if normalized_type is not None:
+        new_part["type"] = normalized_type
+    elif "type" not in new_part:
+        new_part["type"] = _default_content_type_for_role(role)
+    else:
+        new_part["type"] = str(new_part["type"])
+
+    part_type_key = new_part["type"]
+
+    if part_type_key in {"input_text", "output_text", "tool_result"}:
+        if "text" not in new_part and "content" in new_part:
+            new_part["text"] = new_part.pop("content")
+        elif "text" not in new_part and "value" in new_part:
+            new_part["text"] = new_part.pop("value")
+        elif "text" not in new_part and "message" in new_part:
+            new_part["text"] = new_part.pop("message")
+        if "text" not in new_part:
+            new_part["text"] = ""
+
+    if part_type_key == "input_image":
+        if "image_url" in new_part:
+            image_payload = new_part["image_url"]
+            if isinstance(image_payload, dict) and "url" in image_payload and len(image_payload) == 1:
+                new_part["image_url"] = image_payload["url"]
+        elif "image" in new_part:
+            new_part["image_url"] = new_part.pop("image")
+
+    if part_type_key == "input_audio" and "audio" in new_part and "audio_url" not in new_part:
+        new_part["audio_url"] = new_part.pop("audio")
+
+    if part_type_key == "input_video" and "video" in new_part and "video_url" not in new_part:
+        new_part["video_url"] = new_part.pop("video")
+
+    if part_type_key == "input_file" and "file" in new_part and "file_id" not in new_part:
+        new_part["file_id"] = new_part.pop("file")
+
+    return new_part
+
+
+def _normalize_type_by_role(role: str, part_type: Any) -> Optional[str]:
+    if not isinstance(part_type, str):
+        return None
+
+    lowered = part_type.lower()
+    if role == "assistant":
+        return _OUTPUT_TYPE_ALIASES.get(lowered, lowered if lowered.startswith("output_") else None)
+    if role == "tool":
+        return _TOOL_TYPE_ALIASES.get(lowered, lowered if lowered.startswith("tool_") else None)
+    return _INPUT_TYPE_ALIASES.get(lowered, lowered if lowered.startswith("input_") else None)
+
+
+def _default_content_type_for_role(role: str) -> str:
+    if role == "assistant":
+        return "output_text"
+    if role == "tool":
+        return "tool_result"
+    return "input_text"

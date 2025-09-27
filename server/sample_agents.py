@@ -8,7 +8,7 @@ import httpx
 import litellm
 from litellm import CustomLLM, GenericStreamingChunk, HTTPHandler, ModelResponse, AsyncHTTPHandler
 
-from server.utils import ServerError, to_generic_streaming_chunk
+from server.utils import ServerError, convert_chat_messages_to_responses_items, to_generic_streaming_chunk
 
 
 _YODA_SYSTEM_PROMPT = {
@@ -59,7 +59,7 @@ class YodaLLM(CustomLLM):
                 print("\033[1m\033[32mLiteLLM Responses API Request\033[0m")
                 response = litellm.responses(  # TODO Check all params are supported
                     model=self.target_model,
-                    input=messages,
+                    input=convert_chat_messages_to_responses_items(messages),
                     logger_fn=logger_fn,
                     headers=headers or {},
                     timeout=timeout,
@@ -116,7 +116,7 @@ class YodaLLM(CustomLLM):
                 print("\033[1m\033[32mLiteLLM Responses API Request\033[0m")
                 response = await litellm.responses(  # TODO Check all params are supported
                     model=self.target_model,
-                    input=messages,
+                    input=convert_chat_messages_to_responses_items(messages),
                     logger_fn=logger_fn,
                     headers=headers or {},
                     timeout=timeout,
@@ -174,7 +174,7 @@ class YodaLLM(CustomLLM):
                 print("\033[1m\033[32mLiteLLM Responses API Request\033[0m")
                 response = litellm.responses(  # TODO Check all params are supported
                     model=self.target_model,
-                    input=messages,
+                    input=convert_chat_messages_to_responses_items(messages),
                     logger_fn=logger_fn,
                     headers=headers or {},
                     timeout=timeout,
@@ -234,7 +234,7 @@ class YodaLLM(CustomLLM):
                 print("\033[1m\033[32mLiteLLM Responses API Request\033[0m")
                 response = await litellm.responses(  # TODO Check all params are supported
                     model=self.target_model,
-                    input=messages,
+                    input=convert_chat_messages_to_responses_items(messages),
                     logger_fn=logger_fn,
                     headers=headers or {},
                     timeout=timeout,
