@@ -249,6 +249,8 @@ _CONTENT_KEYS_TO_DROP = {"cache_control"}
 
 _FUNCTION_METADATA_KEYS = ("description", "parameters", "strict")
 
+_UNSUPPORTED_RESPONSES_PARAMS = {"stream_options"}
+
 
 def convert_chat_params_to_responses(optional_params: dict[str, Any]) -> dict[str, Any]:
     """Return a copy of optional params adjusted for the Responses API."""
@@ -282,6 +284,10 @@ def convert_chat_params_to_responses(optional_params: dict[str, Any]) -> dict[st
             params.pop("tool_choice", None)
         else:
             params["tool_choice"] = converted_choice
+
+    for key in list(params):
+        if key in _UNSUPPORTED_RESPONSES_PARAMS:
+            params.pop(key, None)
 
     return params
 

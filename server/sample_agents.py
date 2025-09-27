@@ -119,7 +119,7 @@ class YodaLLM(CustomLLM):
 
             if model == "litellm-responses":
                 print("\033[1m\033[32mLiteLLM Responses API Request\033[0m")
-                response = await litellm.responses(  # TODO Check all params are supported
+                response = await litellm.aresponses(  # TODO Check all params are supported
                     model=self.target_model,
                     input=convert_chat_messages_to_responses_items(messages),
                     logger_fn=logger_fn,
@@ -237,7 +237,7 @@ class YodaLLM(CustomLLM):
 
             if model == "litellm-responses":
                 print("\033[1m\033[32mLiteLLM Responses API Request\033[0m")
-                response = await litellm.responses(  # TODO Check all params are supported
+                response = await litellm.aresponses(  # TODO Check all params are supported
                     model=self.target_model,
                     input=convert_chat_messages_to_responses_items(messages),
                     logger_fn=logger_fn,
