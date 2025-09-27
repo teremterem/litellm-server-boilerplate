@@ -594,8 +594,8 @@ def _try_parse_responses_chunk(chunk: Any) -> Optional[dict[str, Any]]:
             if arguments is not None and not isinstance(arguments, str):
                 try:
                     arguments = str(arguments)
-                except Exception:  # pylint: disable=broad-except
-                    arguments = None
+                except Exception as e:
+                    raise RuntimeError("Failed to convert Responses tool_call arguments to string") from e
             call_id = payload.get("id") or payload.get("call_id") or payload.get("tool_call_id")
             tool_use = {
                 "index": index,
@@ -797,8 +797,8 @@ def _convert_responses_tool_call(payload: dict[str, Any]) -> Optional[dict[str, 
         else:
             try:
                 arguments = json.dumps(raw_arguments)
-            except Exception:  # pylint: disable=broad-except
-                arguments = None
+            except Exception as e:
+                raise RuntimeError("Failed to JSON-encode Responses tool_call arguments") from e
     else:
         arguments = str(raw_arguments) if raw_arguments is not None else None
 
