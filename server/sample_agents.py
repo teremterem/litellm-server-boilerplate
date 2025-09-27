@@ -8,7 +8,13 @@ import httpx
 import litellm
 from litellm import CustomLLM, GenericStreamingChunk, HTTPHandler, ModelResponse, AsyncHTTPHandler
 
-from server.utils import ServerError, to_generic_streaming_chunk
+from server.utils import (
+    ServerError,
+    convert_chat_messages_to_responses_items,
+    convert_chat_params_to_responses,
+    convert_responses_to_model_response,
+    to_generic_streaming_chunk,
+)
 
 
 _YODA_SYSTEM_PROMPT = {
@@ -25,7 +31,7 @@ class YodaLLM(CustomLLM):
     TODO Docstring
     """
 
-    def __init__(self, *, target_model: str = "openai/gpt-4o-mini", **kwargs: Any) -> None:
+    def __init__(self, *, target_model: str = "openai/gpt-4o", **kwargs: Any) -> None:
         super().__init__(**kwargs)
         self.target_model = target_model
 
@@ -50,8 +56,8 @@ class YodaLLM(CustomLLM):
     ) -> ModelResponse:
         try:
             messages = messages + [_YODA_SYSTEM_PROMPT]
-            optional_params.pop("max_tokens", None)  # TODO Get rid of this line ?
 
+            optional_params["stream"] = False
             # For Langfuse
             optional_params.setdefault("metadata", {}).setdefault("trace_name", "OUTBOUND-from-completion")
 
@@ -59,13 +65,14 @@ class YodaLLM(CustomLLM):
                 print("\033[1m\033[32mLiteLLM Responses API Request\033[0m")
                 response = litellm.responses(  # TODO Check all params are supported
                     model=self.target_model,
-                    input=messages,
+                    input=convert_chat_messages_to_responses_items(messages),
                     logger_fn=logger_fn,
                     headers=headers or {},
                     timeout=timeout,
                     client=client,
-                    **optional_params,
+                    **convert_chat_params_to_responses(optional_params),
                 )
+                response = convert_responses_to_model_response(response)
             elif model == "litellm-completions":
                 print("\033[1m\033[32mLiteLLM ChatCompletions API Request\033[0m")
                 response = litellm.completion(
@@ -107,22 +114,23 @@ class YodaLLM(CustomLLM):
     ) -> ModelResponse:
         try:
             messages = messages + [_YODA_SYSTEM_PROMPT]
-            optional_params.pop("max_tokens", None)  # TODO Get rid of this line ?
 
+            optional_params["stream"] = False
             # For Langfuse
             optional_params.setdefault("metadata", {}).setdefault("trace_name", "OUTBOUND-from-acompletion")
 
             if model == "litellm-responses":
                 print("\033[1m\033[32mLiteLLM Responses API Request\033[0m")
-                response = await litellm.responses(  # TODO Check all params are supported
+                response = await litellm.aresponses(  # TODO Check all params are supported
                     model=self.target_model,
-                    input=messages,
+                    input=convert_chat_messages_to_responses_items(messages),
                     logger_fn=logger_fn,
                     headers=headers or {},
                     timeout=timeout,
                     client=client,
-                    **optional_params,
+                    **convert_chat_params_to_responses(optional_params),
                 )
+                response = convert_responses_to_model_response(response)
             elif model == "litellm-completions":
                 print("\033[1m\033[32mLiteLLM ChatCompletions API Request\033[0m")
                 response = await litellm.acompletion(
@@ -164,9 +172,8 @@ class YodaLLM(CustomLLM):
     ) -> Generator[GenericStreamingChunk, None, None]:
         try:
             messages = messages + [_YODA_SYSTEM_PROMPT]
-            optional_params.pop("max_tokens", None)  # TODO Get rid of this line ?
-            optional_params["stream"] = True
 
+            optional_params["stream"] = True
             # For Langfuse
             optional_params.setdefault("metadata", {}).setdefault("trace_name", "OUTBOUND-from-streaming")
 
@@ -174,12 +181,12 @@ class YodaLLM(CustomLLM):
                 print("\033[1m\033[32mLiteLLM Responses API Request\033[0m")
                 response = litellm.responses(  # TODO Check all params are supported
                     model=self.target_model,
-                    input=messages,
+                    input=convert_chat_messages_to_responses_items(messages),
                     logger_fn=logger_fn,
                     headers=headers or {},
                     timeout=timeout,
                     client=client,
-                    **optional_params,
+                    **convert_chat_params_to_responses(optional_params),
                 )
             elif model == "litellm-completions":
                 print("\033[1m\033[32mLiteLLM ChatCompletions API Request\033[0m")
@@ -224,22 +231,21 @@ class YodaLLM(CustomLLM):
     ) -> AsyncGenerator[GenericStreamingChunk, None]:
         try:
             messages = messages + [_YODA_SYSTEM_PROMPT]
-            optional_params.pop("max_tokens", None)  # TODO Get rid of this line ?
-            optional_params["stream"] = True
 
+            optional_params["stream"] = True
             # For Langfuse
             optional_params.setdefault("metadata", {}).setdefault("trace_name", "OUTBOUND-from-astreaming")
 
             if model == "litellm-responses":
                 print("\033[1m\033[32mLiteLLM Responses API Request\033[0m")
-                response = await litellm.responses(  # TODO Check all params are supported
+                response = await litellm.aresponses(  # TODO Check all params are supported
                     model=self.target_model,
-                    input=messages,
+                    input=convert_chat_messages_to_responses_items(messages),
                     logger_fn=logger_fn,
                     headers=headers or {},
                     timeout=timeout,
                     client=client,
-                    **optional_params,
+                    **convert_chat_params_to_responses(optional_params),
                 )
             elif model == "litellm-completions":
                 print("\033[1m\033[32mLiteLLM ChatCompletions API Request\033[0m")
