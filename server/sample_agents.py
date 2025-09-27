@@ -55,7 +55,12 @@ class YodaLLM(CustomLLM):
     ) -> ModelResponse:
         try:
             messages = messages + [_YODA_SYSTEM_PROMPT]
-            optional_params.pop("max_tokens", None)  # TODO Get rid of this line ?
+
+            optional_params["stream"] = False
+            # TODO Is it even sensible to try and adapt the incoming params to the outbound call ?
+            #  Maybe just ignore them altogether ?
+            optional_params.pop("max_tokens", None)
+            optional_params.pop("temperature", None)
 
             # For Langfuse
             optional_params.setdefault("metadata", {}).setdefault("trace_name", "OUTBOUND-from-completion")
@@ -113,7 +118,12 @@ class YodaLLM(CustomLLM):
     ) -> ModelResponse:
         try:
             messages = messages + [_YODA_SYSTEM_PROMPT]
-            optional_params.pop("max_tokens", None)  # TODO Get rid of this line ?
+
+            optional_params["stream"] = False
+            # TODO Is it even sensible to try and adapt the incoming params to the outbound call ?
+            #  Maybe just ignore them altogether ?
+            optional_params.pop("max_tokens", None)
+            optional_params.pop("temperature", None)
 
             # For Langfuse
             optional_params.setdefault("metadata", {}).setdefault("trace_name", "OUTBOUND-from-acompletion")
@@ -171,8 +181,12 @@ class YodaLLM(CustomLLM):
     ) -> Generator[GenericStreamingChunk, None, None]:
         try:
             messages = messages + [_YODA_SYSTEM_PROMPT]
-            optional_params.pop("max_tokens", None)  # TODO Get rid of this line ?
+
             optional_params["stream"] = True
+            # TODO Is it even sensible to try and adapt the incoming params to the outbound call ?
+            #  Maybe just ignore them altogether ?
+            optional_params.pop("max_tokens", None)
+            optional_params.pop("temperature", None)
 
             # For Langfuse
             optional_params.setdefault("metadata", {}).setdefault("trace_name", "OUTBOUND-from-streaming")
@@ -231,8 +245,12 @@ class YodaLLM(CustomLLM):
     ) -> AsyncGenerator[GenericStreamingChunk, None]:
         try:
             messages = messages + [_YODA_SYSTEM_PROMPT]
-            optional_params.pop("max_tokens", None)  # TODO Get rid of this line ?
+
             optional_params["stream"] = True
+            # TODO Is it even sensible to try and adapt the incoming params to the outbound call ?
+            #  Maybe just ignore them altogether ?
+            optional_params.pop("max_tokens", None)
+            optional_params.pop("temperature", None)
 
             # For Langfuse
             optional_params.setdefault("metadata", {}).setdefault("trace_name", "OUTBOUND-from-astreaming")
