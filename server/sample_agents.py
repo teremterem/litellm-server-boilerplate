@@ -71,6 +71,7 @@ class YodaLLM(CustomLLM):
                     client=client,
                     **convert_chat_params_to_responses(optional_params),
                 )
+                # TODO Convert ResponsesAPIResponse to ModelResponse ?
             elif model == "litellm-completions":
                 print("\033[1m\033[32mLiteLLM ChatCompletions API Request\033[0m")
                 response = litellm.completion(
@@ -128,6 +129,7 @@ class YodaLLM(CustomLLM):
                     client=client,
                     **convert_chat_params_to_responses(optional_params),
                 )
+                # TODO Convert ResponsesAPIResponse to ModelResponse ?
             elif model == "litellm-completions":
                 print("\033[1m\033[32mLiteLLM ChatCompletions API Request\033[0m")
                 response = await litellm.acompletion(
