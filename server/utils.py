@@ -1,7 +1,13 @@
+# pylint: disable=too-many-branches,too-many-locals,too-many-statements,too-many-return-statements
+# pylint: disable=too-many-nested-blocks
+"""
+NOTE: The utilities in this module were mostly vibe-coded without review.
+"""
 from copy import deepcopy
 from typing import Any, Optional, Union
+import json
 
-from litellm import GenericStreamingChunk
+from litellm import GenericStreamingChunk, ModelResponse
 
 
 class ServerError(RuntimeError):
@@ -18,8 +24,6 @@ def to_generic_streaming_chunk(chunk: Any) -> GenericStreamingChunk:
     """
     Best-effort convert a LiteLLM ModelResponseStream chunk into GenericStreamingChunk.
 
-    NOTE: As a "low-stakes" utility, this function was vibe-coded without review.
-
     GenericStreamingChunk TypedDict keys:
       - text: str (required)
       - is_finished: bool (required)
@@ -29,8 +33,6 @@ def to_generic_streaming_chunk(chunk: Any) -> GenericStreamingChunk:
       - tool_use: Optional[ChatCompletionToolCallChunk] (default None)
       - provider_specific_fields: Optional[dict]
     """
-    # pylint: disable=too-many-locals,too-many-branches,too-many-statements
-
     # Defaults
     text: str = ""
     finish_reason: str = ""
@@ -349,7 +351,6 @@ def _normalize_message_content(role: str, content: Any) -> list[Any]:
 
 
 def _convert_content_part(role: str, part: Any) -> dict[str, Any]:
-    # pylint: disable=too-many-branches
     if isinstance(part, str):
         return {"type": _default_content_type_for_role(role), "text": part}
 
@@ -477,7 +478,6 @@ def _convert_functions_list(functions: Any) -> list[dict[str, Any]]:
 
 
 def _convert_tool_choice(tool_choice: Any) -> Optional[Any]:
-    # pylint: disable=too-many-return-statements
     if isinstance(tool_choice, str):
         return tool_choice
 
@@ -532,7 +532,6 @@ def _default_content_type_for_role(role: str) -> str:
 
 
 def _try_parse_responses_chunk(chunk: Any) -> Optional[dict[str, Any]]:
-    # pylint: disable=too-many-branches,too-many-locals,too-many-statements
     def _get(obj: Any, key: str, default: Any = None) -> Any:
         if isinstance(obj, dict):
             return obj.get(key, default)
@@ -640,3 +639,176 @@ def _try_parse_responses_chunk(chunk: Any) -> Optional[dict[str, Any]]:
         "tool_use": tool_use,
         "provider_specific_fields": provider_specific_fields,
     }
+
+
+def convert_responses_to_model_response(responses_response: Any) -> ModelResponse:
+    """Best-effort convert a LiteLLM ResponsesAPIResponse into a ModelResponse."""
+
+    if responses_response is None:
+        raise ValueError("responses_response cannot be None")
+
+    def _get(obj: Any, key: str, default: Any = None) -> Any:
+        if isinstance(obj, dict):
+            return obj.get(key, default)
+        return getattr(obj, key, default)
+
+    model_response: dict[str, Any] = {}
+
+    # Top-level metadata
+    model_response["id"] = _get(responses_response, "id")
+    model_response["object"] = _get(responses_response, "object", "chat.completion")
+    model_response["created"] = _get(responses_response, "created") or _get(responses_response, "created_at")
+    model_response["model"] = _get(responses_response, "model")
+
+    metadata = _get(responses_response, "metadata")
+    if metadata is not None:
+        model_response["metadata"] = deepcopy(metadata)
+
+    # Usage
+    usage = _get(responses_response, "usage")
+    token_usage: dict[str, Any]
+    if isinstance(usage, dict):
+        prompt_tokens = usage.get("prompt_tokens")
+        completion_tokens = usage.get("completion_tokens")
+        total_tokens = usage.get("total_tokens")
+        if prompt_tokens is not None and completion_tokens is not None:
+            total_tokens = prompt_tokens + completion_tokens
+        token_usage = {
+            "prompt_tokens": prompt_tokens,
+            "completion_tokens": completion_tokens,
+            "total_tokens": total_tokens,
+        }
+        model_response["usage"] = token_usage
+
+    # Aggregate assistant content and optional tool calls
+    text_segments: list[str] = []
+    tool_calls: list[dict[str, Any]] = []
+    function_call: Optional[dict[str, Any]] = None
+    output = _get(responses_response, "output")
+    if isinstance(output, list):
+        for item in output:
+            if not isinstance(item, dict):
+                continue
+            item_type = item.get("type") or item.get("event")
+            if item_type == "message":
+                content = item.get("content")
+                text_value = _flatten_responses_text(content)
+                if text_value:
+                    text_segments.append(text_value)
+            elif item_type == "tool_call":
+                converted_tool = _convert_responses_tool_call(item)
+                if converted_tool is not None:
+                    tool_calls.append(converted_tool)
+            elif item_type == "function_call" and function_call is None:
+                maybe_call = _convert_responses_tool_call(item)
+                if maybe_call is not None:
+                    function_call = maybe_call["function"]
+
+    message_content = "".join(text_segments) if text_segments else ""
+
+    # Create choices entry
+    choice_message: dict[str, Any] = {
+        "role": "assistant",
+        "content": message_content,
+    }
+    if tool_calls:
+        choice_message["tool_calls"] = tool_calls
+    if function_call is not None:
+        choice_message["function_call"] = function_call
+
+    finish_reason = None
+    status = _get(responses_response, "status")
+    if isinstance(status, str):
+        if status == "completed":
+            finish_reason = "stop"
+        elif status in {"canceled", "cancelled"}:
+            finish_reason = "cancelled"
+        elif status == "failed":
+            finish_reason = "error"
+
+    model_response["choices"] = [
+        {
+            "index": 0,
+            "finish_reason": finish_reason,
+            "message": choice_message,
+        }
+    ]
+
+    # Add response-level metadata for traceability
+    provider_fields: dict[str, Any] = {}
+    for key in ("response", "meta", "trace_id", "previous_response_id"):
+        value = _get(responses_response, key)
+        if value is not None:
+            provider_fields[key] = deepcopy(value)
+    if provider_fields:
+        model_response["provider_specific_fields"] = provider_fields
+
+    return ModelResponse(**model_response)
+
+
+def _flatten_responses_text(content: Any) -> str:
+    if isinstance(content, str):
+        return content
+
+    if isinstance(content, list):
+        segments: list[str] = []
+        for part in content:
+            if isinstance(part, dict):
+                # Prefer explicit text fields
+                for key in ("text", "input_text", "output_text"):
+                    value = part.get(key)
+                    if isinstance(value, str):
+                        segments.append(value)
+                        break
+                else:
+                    nested = part.get("content")
+                    if nested is not None:
+                        flattened = _flatten_responses_text(nested)
+                        if flattened:
+                            segments.append(flattened)
+            elif isinstance(part, str):
+                segments.append(part)
+        return "".join(segments)
+
+    if isinstance(content, dict):
+        return _flatten_responses_text(content.get("content"))
+
+    return "" if content is None else str(content)
+
+
+def _convert_responses_tool_call(payload: dict[str, Any]) -> Optional[dict[str, Any]]:
+    name = payload.get("name") or payload.get("function_name")
+    if not isinstance(name, str) or not name:
+        return None
+
+    call_id = payload.get("id") or payload.get("call_id") or payload.get("tool_call_id")
+
+    raw_arguments = payload.get("arguments")
+    if raw_arguments is None:
+        raw_arguments = payload.get("input") or payload.get("input_arguments")
+
+    arguments: Optional[str]
+    if isinstance(raw_arguments, str):
+        arguments = raw_arguments
+    elif isinstance(raw_arguments, (list, dict)):
+        flattened = _flatten_responses_text(raw_arguments)
+        if flattened:
+            arguments = flattened
+        else:
+            try:
+                arguments = json.dumps(raw_arguments)
+            except Exception:  # pylint: disable=broad-except
+                arguments = None
+    else:
+        arguments = str(raw_arguments) if raw_arguments is not None else None
+
+    tool_call = {
+        "id": call_id if isinstance(call_id, str) else None,
+        "type": "function",
+        "function": {
+            "name": name,
+            "arguments": arguments or "",
+        },
+    }
+
+    return tool_call
