@@ -4,7 +4,7 @@ custom:
       # Provide the key instead in each "model" block within "litellm/litellm-config.yaml"
       apiKey: "sk-from-config-file"
       # See the required changes above in "Start LiteLLM Proxy Server" step.
-      baseURL: "https://ca-openai-litellm.internal.livelygrass-bf5deb4f.swedencentral.azurecontainerapps.io"
+      baseURL: "https://ca-openai-voet-litellm.internal.wonderfulsea-0efbac64.westeurope.azurecontainerapps.io"
       # A "default" model to start new users with. The "fetch" will pull the rest of the available models from LiteLLM
       # More or less this is "irrelevant", you can pick any model. Just pick one you have defined in LiteLLM.
       models:
