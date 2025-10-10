@@ -7,7 +7,7 @@ This repository lets you use **Anthropic's Claude Code CLI** with **OpenAI's GPT
 ### Prerequisites
 
 - [OpenAI API key 🔑](https://platform.openai.com/settings/organization/api-keys)
-- [Anthropic API key 🔑](https://console.anthropic.com/settings/keys) - optional (if you decide not to remap to OpenAI in certain scenarios)
+- [Anthropic API key 🔑](https://console.anthropic.com/settings/keys) - optional (if you decide not to remap some Claude models to OpenAI)
 - Either [uv](https://docs.astral.sh/uv/getting-started/installation/) or [Docker Desktop](https://docs.docker.com/desktop/), depending on your preferred setup method
 
 ### First time using GPT-5 via API?
@@ -29,17 +29,21 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
    ```bash
    cp .env.template .env
    ```
+
    Edit `.env` and add your OpenAI API key:
    ```dotenv
    OPENAI_API_KEY=your-openai-api-key-here
    # Optional: only needed if you plan to use Anthropic models
    # ANTHROPIC_API_KEY=your-anthropic-api-key-here
 
-   # Recommended: remap Claude models to GPT‑5 variants to ensure all
-   # built-in agents in Claude Code also use GPT‑5
-   REMAP_CLAUDE_HAIKU_TO=gpt-5-mini-reason-minimal
-   REMAP_CLAUDE_SONNET_TO=gpt-5-reason-medium
-   REMAP_CLAUDE_OPUS_TO=gpt-5-reason-high
+   # Optional (see .env.template for details):
+   # LITELLM_MASTER_KEY=your-master-key-here
+
+   # Optional: override the default remaps if you need to (the values you see
+   # below are the defaults - see .env.template for more info)
+   # REMAP_CLAUDE_HAIKU_TO=gpt-5-mini-reason-minimal
+   # REMAP_CLAUDE_SONNET_TO=gpt-5-reason-medium
+   # REMAP_CLAUDE_OPUS_TO=gpt-5-reason-high
 
    # Some more optional settings (see .env.template for details)
    ...
@@ -59,7 +63,7 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
       uv run litellm --config config.yaml
       ```
 
-   2) **OR via `Docker`** (make sure to install [Docker Desktop](https://docs.docker.com/desktop/install/mac-install/) first):
+   2) **OR via `Docker`** (make sure to install [Docker Desktop](https://docs.docker.com/desktop/ first):
 
       **OPTION 3:** Run `Docker` in the foreground:
       ```bash
@@ -82,7 +86,17 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
       ```
       > **NOTE:** To run with this command in the foreground instead of the background, remove the `-d` flag.
 
-      > **NOTE:** The `Docker` options above will pull the latest image from `GHCR` and will ignore all your local files except `.env`. For more detailed `Docker` deployment instructions and more options (like watching logs, building `Docker` image from source yourself, using `Docker Compose`, etc.), see [DOCKER_DEPLOYMENT.md](DOCKER_DEPLOYMENT.md)
+      To see the logs, run:
+      ```bash
+      docker logs -f claude-code-gpt-5
+      ```
+
+      To stop and remove the container, run:
+      ```bash
+      ./kill-docker.sh
+      ```
+
+      > **NOTE:** The `Docker` options above will pull the latest image from `GHCR` and will ignore all your local files except `.env`. For more detailed `Docker` deployment instructions and more options (like building `Docker` image from source yourself, using `Docker Compose`, etc.), see [DOCKER_DEPLOYMENT.md](DOCKER_DEPLOYMENT.md)
 
 ### Using with Claude Code 🎮
 
@@ -92,19 +106,9 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
    ```
 
 2. **Connect to GPT-5 instead of Claude:**
-
-   Recommended:
    ```bash
    ANTHROPIC_BASE_URL=http://localhost:4000 claude
    ```
-
-   Optionally, you can override the default model on the CLI side with:
-   ```bash
-   ANTHROPIC_BASE_URL=http://localhost:4000 claude --model gpt-5-reason-medium
-   ```
-
-   > **NOTE:** The former is more desirable than the latter - relying solely on the remap env vars and not explicitly setting the model in the CLI eliminates confusion when it comes to CLI's built-in agents, which are hardwired to always use a specific Claude model and will ignore the CLI's global model choice anyway.
-
 
    If you set `LITELLM_MASTER_KEY` for the proxy (see `.env.template` for details), pass it as the Anthropic API key for the CLI:
    ```bash
