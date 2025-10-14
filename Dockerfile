@@ -24,15 +24,6 @@ COPY pyproject.toml ./
 # so this layer is rebuilt less often during development)
 RUN uv sync --frozen
 
-# Set up the environment variable defaults.
-# NOTE: This works because python_dotenv does NOT override variables that
-# already exist in the environment; it only loads missing ones from the .env
-# file.
-COPY .env.template .env
-# TODO This would break if LITELLM_MODE env var is set to a value other than
-#  DEV (although, when it is not set, it is DEV by default). What would be the
-#  best way to adapt to the approach taken by litellm ?
-
 # Copy all the project files
 COPY . .
 
@@ -44,4 +35,5 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
     CMD curl -f -H "Authorization: Bearer ${LITELLM_MASTER_KEY}" http://localhost:4000/health || exit 1
 
 # Default command to run the LiteLLM proxy
+# TODO Do we need to set PYTHONUNBUFFERED=1 ?
 CMD ["uv", "run", "litellm", "--config", "config.yaml", "--port", "4000", "--host", "0.0.0.0"]

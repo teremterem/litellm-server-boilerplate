@@ -14,10 +14,14 @@ from litellm import (
     ResponsesAPIResponse,
 )
 
-from proxy.config import ANTHROPIC, ENFORCE_ONE_TOOL_CALL_PER_RESPONSE, WRITE_TRACES_TO_FILES
-from proxy.route_model import ModelRoute
-from proxy.tracing_in_markdown import write_request_trace, write_response_trace, write_streaming_response_trace
-from proxy.utils import (
+from claude_code_proxy.proxy_config import ANTHROPIC, ENFORCE_ONE_TOOL_CALL_PER_RESPONSE, WRITE_TRACES_TO_FILES
+from claude_code_proxy.route_model import ModelRoute
+from claude_code_proxy.tracing_in_markdown import (
+    write_request_trace,
+    write_response_trace,
+    write_streaming_response_trace,
+)
+from common.utils import (
     ProxyError,
     convert_chat_messages_to_respapi,
     convert_chat_params_to_respapi,
@@ -50,7 +54,7 @@ def _adapt_for_non_anthropic_models(model: str, messages_complapi: list, params_
         params_complapi.get("max_tokens") == 1
         and len(messages_complapi) == 1
         and messages_complapi[0].get("role") == "user"
-        and messages_complapi[0].get("content") == "test"
+        and messages_complapi[0].get("content") in ["quota", "test"]
     ):
         # This is a "connectivity test" request by Claude Code => we need to make sure non-Anthropic models don't fail
         # because of exceeding max_tokens
@@ -140,11 +144,7 @@ class RoutedRequest:
             )
 
 
-class CustomLLMRouter(CustomLLM):
-    """
-    Routes model requests to the correct provider and parameters.
-    """
-
+class ClaudeCodeRouter(CustomLLM):
     # pylint: disable=too-many-positional-arguments,too-many-locals
 
     def completion(
@@ -446,4 +446,4 @@ class CustomLLMRouter(CustomLLM):
             raise ProxyError(e) from e
 
 
-custom_llm_router = CustomLLMRouter()
+claude_code_router = ClaudeCodeRouter()
