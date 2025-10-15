@@ -60,7 +60,7 @@ echo "🌐 HINT: Default Web UI URL (IF NOT CHANGED IN 'librechat/.env'):"
 echo ""
 echo "   http://localhost:3080"
 echo ""
-echo "▶️  Starting LibreChat stack in the foreground (Ctrl+C to stop)..."
+echo "▶️  Starting LibreChat stack (Ctrl+C to stop IF in the foreground)..."
 echo ""
 # Pass through any flags supplied to this script (e.g., --build, -d) to
 # `docker compose up`.
