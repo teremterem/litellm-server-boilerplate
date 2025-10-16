@@ -1,4 +1,4 @@
-![Claude Code with GPT-5](claude-code-gpt-5.jpeg)
+![Claude Code with GPT-5](images/claude-code-gpt-5.jpeg)
 
 This repository lets you use **Anthropic's Claude Code CLI** with **OpenAI's GPT-5** via a local LiteLLM proxy.
 
