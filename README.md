@@ -3,7 +3,12 @@
         src="https://raw.githubusercontent.com/teremterem/claude-code-gpt-5/main/images/claude-code-gpt-5.jpeg">
 </p>
 
+
 This repository lets you use **Anthropic's Claude Code CLI** with **OpenAI's GPT-5** via a local LiteLLM proxy.
+
+> ⚠️ **ATTENTION** ⚠️
+>
+> If you're here to set up `your own LiteLLM Server` (and connect `LibreChat` or similar UI), head over to the [main-boilerplate](https://github.com/teremterem/claude-code-gpt-5/tree/main-boilerplate) branch and check the [README](https://github.com/teremterem/claude-code-gpt-5/blob/main-boilerplate/README.md) there - a `boilerplate` version of this repo with all the Claude Code CLI stuff stripped away (which is still kept up to date with all the relevant improvements from the regular `main`, however).
 
 ## Quick Start ⚡
 
