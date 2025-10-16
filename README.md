@@ -1,4 +1,7 @@
-![Claude Code with GPT-5](claude-code-gpt-5.jpeg)
+<p align="center">
+    <img alt="Claude Code with GPT-5"
+        src="https://raw.githubusercontent.com/teremterem/claude-code-gpt-5/main/claude-code-gpt-5.jpeg">
+</p>
 
 This repository lets you use **Anthropic's Claude Code CLI** with **OpenAI's GPT-5** via a local LiteLLM proxy.
 
@@ -155,14 +158,6 @@ This is planned to be fixed soon.
 ## P. S. You are welcome to join our [MiniAgents Discord Server 👥](https://discord.gg/ptSvVnbwKt)
 
 ## And if you like the project, please give it a Star 💫
-
-<a href="https://www.star-history.com/#teremterem/claude-code-gpt-5&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=teremterem/claude-code-gpt-5&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=teremterem/claude-code-gpt-5&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=teremterem/claude-code-gpt-5&type=date&legend=top-left" />
- </picture>
-</a>
 
 <p align="center">
 <a href="https://www.star-history.com/#teremterem/claude-code-gpt-5&type=date&legend=top-left">
