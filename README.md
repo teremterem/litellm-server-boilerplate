@@ -155,3 +155,5 @@ This is planned to be fixed soon.
 ## P. S. You are welcome to join our [MiniAgents Discord Server 👥](https://discord.gg/ptSvVnbwKt)
 
 ## And if you like the project, please give it a Star 💫
+
+[![Star History Chart](https://api.star-history.com/svg?repos=teremterem/claude-code-gpt-5&type=date&legend=top-left)](https://www.star-history.com/#teremterem/claude-code-gpt-5&type=date&legend=top-left)
