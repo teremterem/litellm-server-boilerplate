@@ -35,5 +35,4 @@ EXPOSE 4000
 #    CMD curl -f -H "Authorization: Bearer ${LITELLM_MASTER_KEY}" http://localhost:4000/health || exit 1
 
 # Default command to run the LiteLLM server
-# TODO Do we need to set PYTHONUNBUFFERED=1 ?
 CMD ["uv", "run", "litellm", "--config", "config.yaml", "--port", "4000", "--host", "0.0.0.0"]
