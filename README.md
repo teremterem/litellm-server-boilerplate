@@ -8,7 +8,7 @@ This repository lets you use **Anthropic's Claude Code CLI** with **OpenAI's GPT
 
 > ⚠️ **ATTENTION** ⚠️
 >
-> If you're here to set up `your own LiteLLM Server` (potentially with `LibreChat` or similar UI), head over to the [main-boilerplate](https://github.com/teremterem/claude-code-gpt-5/tree/main-boilerplate) branch and check the [README](https://github.com/teremterem/claude-code-gpt-5/blob/main-boilerplate/README.md) there - the "boilerplate" version of this repo with all the Claude Code CLI stuff stripped away (but which is still kept up to date with all the relevant improvements from the regular `main`).
+> If you're here to set up `your own LiteLLM Server` (potentially with `LibreChat` or similar UI), head over to the [main-boilerplate](https://github.com/teremterem/claude-code-gpt-5/tree/main-boilerplate) branch. It contains a "boilerplate" version of this repo with Claude Code CLI related stuff stripped away for simplicity, and with a version of [README.md](https://github.com/teremterem/claude-code-gpt-5/blob/main-boilerplate/README.md) that specifically explains how to build on top of this repo as a boilerplate.
 
 ## Quick Start ⚡
 
