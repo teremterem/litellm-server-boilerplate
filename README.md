@@ -1,3 +1,5 @@
+# ⚠️ ATTENTION: THIS PROJECT WAS MOVED [HERE](https://github.com/teremterem/claude-code-gpt-5/tree/main-boilerplate)! ⚠️
+
 # LiteLLM Server Boilerplate
 
 TODO Short description
