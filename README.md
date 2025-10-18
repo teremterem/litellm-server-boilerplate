@@ -53,7 +53,7 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
    ```
 
    ```bash
-   git push -u origin main
+   git push --set-upstream origin main
    ```
 
    Even though this step is optional, it is generally a good idea to have your own remote repository to push your changes to.
