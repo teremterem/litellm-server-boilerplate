@@ -43,7 +43,7 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
 2. **Create `main` branch from the `main-boilerplate` in your local repository:**
 
    ```bash
-   git switch -c main
+   git switch --create main
    ```
 
 3. **(Optional) Set up `origin` remote and push your `main` branch to your remote repository:**
