@@ -2,12 +2,16 @@
 
 This guide explains how to deploy the LiteLLM Server using Docker. It DOES NOT cover the deployment of the LibreChat UI - for the latter see the [README](../README.md).
 
-## 🐳 Dummy Docker Image
+## 🐳 Dummy Docker Images
 
-The dummy Docker image with Yoda example is available in GitHub Container Registry:
-
+LiteLLM Server that contains the Yoda example:
 ```
-ghcr.io/teremterem/my-litellm-server:latest
+ghcr.io/teremterem/litellm-server-yoda:latest
+```
+
+LibreChat image with the config for the Yoda example baked in:
+```
+ghcr.io/teremterem/librechat-yoda:latest
 ```
 
 ## 🚀 Quick Start

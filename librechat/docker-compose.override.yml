@@ -8,12 +8,16 @@ services:
       # To boost performance of `uv sync` operation
       - litellm-uv-cache:/root/.cache/uv
 
-    # # If you want to use a pre-built image from your container registry:
+    # # If you want to use a pre-built image from your container registry of
+    # # choice:
+    # #
     # #  1) Comment out the `build:` and `volumes:` entries above
+    # #
     # #  2) Uncomment the `image:` entry below
+    # #
     # #  3) Replace the image name with the one you built and pushed to your
-    # #     container registry
-    # image: ghcr.io/teremterem/my-litellm-server:latest
+    # #     container registry of choice
+    # image: ghcr.io/teremterem/litellm-server-yoda:latest
 
     container_name: LiteLLM-Server
     # ports:
@@ -28,14 +32,18 @@ services:
       - ../.env
 
   api:
-    # Let's pin LibreChat to a specific image version
+    # # Let's pin LibreChat to a specific image version
     image: ghcr.io/danny-avila/librechat:v0.8.0
     # If you want to use your own pre-built LibreChat image from your container
-    # registry:
-    #  1) Replace the image name above with the one you built and pushed to your
-    #     container registry
-    #  2) If you already baked your custom librechat.yaml file into your image,
-    #     comment out the `volumes:` entry below so it doesn't get overridden
+    # registry of choice:
+    #
+    #  1) Replace the image name above with the one you built and pushed to
+    #     your container registry of choice
+    #     - EXAMPLE: ghcr.io/teremterem/librechat-yoda:latest
+    #        (a dummy image pre-built with the config for the Yoda example)
+    #
+    #  2) Comment out the `volumes:` entry below so librechat.yaml that was
+    #     baked into the image doesn't get overridden
     volumes:
       - ./librechat.yaml:/app/librechat.yaml
 

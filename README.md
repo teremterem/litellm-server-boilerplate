@@ -58,7 +58,7 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
 
    Even though this step is optional, it is generally a good idea to have your own remote repository to push your changes to.
 
-4. **Configure Environment Variables:**
+4. **Configure Environment Variables for the LiteLLM Server:**
 
    Copy the template file to create your `.env`:
    ```bash
@@ -76,7 +76,16 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
    ...
    ```
 
-5. **Run your LiteLLM Server with LibreChat and the Yoda example** (make sure to install [Docker Desktop](https://docs.docker.com/desktop/) first):
+5. **Configure Environment Variables for LibreChat:**
+
+   Copy `librechat/.env.example` to `librechat/.env`:
+   ```bash
+   cp librechat/.env.example librechat/.env
+   ```
+
+   (Optional) Edit `librechat/.env` if necessary (in case of local runs, it will work even if you don't edit it).
+
+6. **Run your LiteLLM Server with LibreChat and the Yoda example** (make sure to install [Docker Desktop](https://docs.docker.com/desktop/) first):
 
    ```bash
    ./librechat/run-docker-compose.sh
