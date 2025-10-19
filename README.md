@@ -187,12 +187,11 @@ echo "$GITHUB_PAT" | docker login ghcr.io -u <GITHUB_USERNAME> --password-stdin
 
 The root Dockerfile builds the LiteLLM server (listens on port 4000 by default).
 
-Pick an image name under your account/org and a version tag:
-- IMAGE="ghcr.io/OWNER/image-name"   # e.g., ghcr.io/acme/my-litellm-server
-- VERSION="0.1.0"
-
 Multi-arch build and push (recommended):
 ```bash
+IMAGE="ghcr.io/<OWNER>/<image-name>"
+VERSION="0.1.0"
+
 docker buildx build \
   --platform linux/amd64,linux/arm64 \
   -t "$IMAGE:$VERSION" \
@@ -202,7 +201,11 @@ docker buildx build \
 
 Single-arch (dev) alternative:
 ```bash
-docker build -t "$IMAGE:latest" .
+IMAGE="ghcr.io/<OWNER>/<image-name>"
+VERSION="0.1.0"
+
+docker build -t "$IMAGE:$VERSION" -t "$IMAGE:latest" .
+docker push "$IMAGE:$VERSION"
 docker push "$IMAGE:latest"
 ```
 
