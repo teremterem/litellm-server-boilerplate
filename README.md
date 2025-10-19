@@ -219,7 +219,6 @@ LIBRECHAT_IMAGE="ghcr.io/<OWNER>/librechat-with-config"
 VERSION="0.1.0"
 
 docker buildx build \
-  -f librechat/Dockerfile \
   --platform linux/amd64,linux/arm64 \
   -t "$LIBRECHAT_IMAGE:$VERSION" \
   -t "$LIBRECHAT_IMAGE:latest" \
