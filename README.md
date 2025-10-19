@@ -223,7 +223,8 @@ docker buildx build \
   --platform linux/amd64,linux/arm64 \
   -t "$LIBRECHAT_IMAGE:$VERSION" \
   -t "$LIBRECHAT_IMAGE:latest" \
-  --push .
+  --push \
+  librechat/
 ```
 
 ### Notes and tips
