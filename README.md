@@ -178,7 +178,7 @@ Publishing your images to a container registry might make deployment of your Lit
 
 ```bash
 # Replace <GITHUB_USERNAME> and ensure $GITHUB_PAT is set in your shell
-echo "$GITHUB_PAT" | docker login ghcr.io -u <GITHUB_USERNAME> --password-stdin
+echo "${GITHUB_PAT}" | docker login ghcr.io -u <GITHUB_USERNAME> --password-stdin
 ```
 
 > **WARNING:** Never commit your PAT to version control. Store it in a secure secret manager or CI secret.
@@ -194,8 +194,8 @@ VERSION="0.1.0"
 
 docker buildx build \
   --platform linux/amd64,linux/arm64 \
-  -t "$IMAGE:$VERSION" \
-  -t "$IMAGE:latest" \
+  -t "${IMAGE}:${VERSION}" \
+  -t "${IMAGE}:latest" \
   --push .
 ```
 
@@ -204,9 +204,9 @@ Single-arch (dev) alternative:
 IMAGE="ghcr.io/<OWNER>/<image-name>"
 VERSION="0.1.0"
 
-docker build -t "$IMAGE:$VERSION" -t "$IMAGE:latest" .
-docker push "$IMAGE:$VERSION"
-docker push "$IMAGE:latest"
+docker build -t "${IMAGE}:${VERSION}" -t "${IMAGE}:latest" .
+docker push "${IMAGE}:${VERSION}"
+docker push "${IMAGE}:latest"
 ```
 
 ### 3) Publish a LibreChat image with your custom `librechat.yaml`
@@ -220,8 +220,8 @@ VERSION="0.1.0"
 
 docker buildx build \
   --platform linux/amd64,linux/arm64 \
-  -t "$LIBRECHAT_IMAGE:$VERSION" \
-  -t "$LIBRECHAT_IMAGE:latest" \
+  -t "${LIBRECHAT_IMAGE}:${VERSION}" \
+  -t "${LIBRECHAT_IMAGE}:latest" \
   --push \
   librechat/
 ```

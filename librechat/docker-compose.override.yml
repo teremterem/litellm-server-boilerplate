@@ -32,7 +32,7 @@ services:
       - ../.env
 
   api:
-    # # Let's pin LibreChat to a specific image version
+    # Let's pin LibreChat to a specific image version
     image: ghcr.io/danny-avila/librechat:v0.8.0
     # If you want to use your own pre-built LibreChat image from your container
     # registry of choice:
