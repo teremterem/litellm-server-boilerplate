@@ -3,8 +3,8 @@ services:
     # # (Optional) Uncomment the `image:` entry below and set it to point at
     # # the image you built and pushed to your container registry of choice.
     # #
-    # # OR use as is together with `docker-compose.dev.yml` to build the image
-    # # locally from source code.
+    # # Otherwise leave this file untouched and use it with
+    # # `docker-compose.dev.yml` to build the image locally from source code.
     # image: ghcr.io/teremterem/litellm-server-yoda:latest
     container_name: my-litellm-server
     ports:
