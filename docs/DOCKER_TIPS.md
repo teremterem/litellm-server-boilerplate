@@ -1,4 +1,4 @@
-# Docker Tips for working with the LiteLLM Server
+# Docker Tips for the LiteLLM Server
 
 This guide explains how to deploy the LiteLLM Server using Docker. It DOES NOT cover the deployment of the LibreChat UI - for the latter see the [README](../README.md).
 
