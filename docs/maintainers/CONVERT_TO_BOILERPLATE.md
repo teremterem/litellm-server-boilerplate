@@ -316,7 +316,7 @@ So, in order to conclude the conversion, do the following.
 18. SQUASH and merge `boilerplate-MANUAL-merging-branch` into `boilerplate-merging-branch` using the Pull Request that you created:
 
     ```bash
-    gh pr merge --squash --delete-branch --auto
+    gh pr merge --squash --delete-branch
     ```
 
 19. Create a GitHub Pull Request of `boilerplate-merging-branch` into `main-boilerplate`:
@@ -338,7 +338,7 @@ So, in order to conclude the conversion, do the following.
 22. Merge `boilerplate-merging-branch` into `main-boilerplate` using the Pull Request that you created. **DO NOT SQUASH, DO A MERGE COMMIT INSTEAD!** We want `main-boilerplate` to be marked as in-sync with the `main` branch:
 
     ```bash
-    gh pr merge --merge --delete-branch --auto
+    gh pr merge --merge --delete-branch
     ```
 
 23. **Test `main-boilerplate` after the final merge.**
