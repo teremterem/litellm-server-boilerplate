@@ -12,13 +12,13 @@ cd <repo-root-dir>
 
 ### Preparation
 
-1. Backup the content of the `main` branch of the repo to a separate directory:
+1. Backup the content of the `main` branch of the repo to a separate directory.
+
+   **Delete the existing backup directory if it exists:**
 
    ```bash
-   rm -ri ../repo-main-backup-dir
+   rm -r ../repo-main-backup-dir
    ```
-
-   > **NOTE:** The command above will ask about deleting each and every file. If the directory exists already, this will make you cognizant of this fact. **Retry without `-i` to actually delete it** (no confirmations will be asked).
 
    Proceed with the backup:
 
@@ -36,13 +36,13 @@ cd <repo-root-dir>
    rm ../repo-main-backup-dir/librechat/.env
    ```
 
-2. Backup the content of the `main-boilerplate` branch of the repo to a separate directory:
+2. Backup the content of the `main-boilerplate` branch of the repo to a separate directory.
+
+    **Delete the existing backup directory if it exists:**
 
    ```bash
-   rm -ri ../repo-boilerplate-backup-dir
+   rm -r ../repo-boilerplate-backup-dir
    ```
-
-   > **NOTE:** The command above will ask about deleting each and every file. If the directory exists already, this will make you cognizant of this fact. **Retry without `-i` to actually delete it** (no confirmations will be asked).
 
    Proceed with the backup:
 
@@ -62,8 +62,6 @@ cd <repo-root-dir>
 
 3. Create a feature branch from `main-boilerplate`:
 
-   > ⚠️ **ATTENTION** ⚠️ If `boilerplate-merging-branch` already exists, first make sure to delete it both - locally and from the remote.
-
    ```bash
    git switch --create boilerplate-merging-branch
    ```
@@ -71,6 +69,8 @@ cd <repo-root-dir>
    ```bash
    git push --set-upstream origin boilerplate-merging-branch
    ```
+
+   > ⚠️ **ATTENTION** ⚠️ If `boilerplate-merging-branch` already exists, either locally or on the remote, make sure to delete both - the local branch and the remote branch - and then retry the command(s) above.
 
 4. Merge `main` into `boilerplate-merging-branch` in the following way:
 
@@ -98,8 +98,6 @@ cd <repo-root-dir>
 
 5. **Create a feature branch from the feature branch:**
 
-   > ⚠️ **ATTENTION** ⚠️ If `boilerplate-MANUAL-merging-branch` already exists, first make sure to delete it both - locally and from the remote.
-
    ```bash
    git switch --create boilerplate-MANUAL-merging-branch
    ```
@@ -107,6 +105,8 @@ cd <repo-root-dir>
    ```bash
    git push --set-upstream origin boilerplate-MANUAL-merging-branch
    ```
+
+   > ⚠️ **ATTENTION** ⚠️ If `boilerplate-MANUAL-merging-branch` already exists, either locally or on the remote, make sure to delete both - the local branch and the remote branch - and then retry the command(s) above.
 
 ### Delete irrelevant files
 
@@ -141,10 +141,6 @@ cd <repo-root-dir>
    git push
    git status
    ```
-
-   TODO Advice to check `docs/DOCKER_PUBLISHING.md` against similar section(s) in `README_BOILERPLATE.md` first
-
-   TODO Advice to review all these files before the actual deletion
 
 ### Swap the README
 
@@ -201,8 +197,6 @@ cd <repo-root-dir>
    git add --all
    git status
    ```
-
-   TODO Advice to review both variants (the diff) to see if there is anything useful in the non-boilerplate version that might make sense to incorporate into the boilerplate version
 
    ```bash
    git commit -m "Restore boilerplate-specific versions of certain files"
@@ -284,13 +278,14 @@ cd <repo-root-dir>
 ### Merge the rest of the files the usual way
 
 The remaining files and folders should be merged the usual way. Files and folders like:
+
 - `common/`
 - `librechat/`
 - `yoda_example/`
 - the rest of the files in the root directory
 - etc.
 
-So, in order to conclude the conversion, do the following:
+So, in order to conclude the conversion, do the following.
 
 15. Create a GitHub Pull Request of `boilerplate-MANUAL-merging-branch` into `boilerplate-merging-branch`:
 
@@ -306,19 +301,25 @@ So, in order to conclude the conversion, do the following:
 
 16. **Thoroughly review the diff in this PR and make changes in `boilerplate-MANUAL-merging-branch` if needed.**
 
+    Things to look for:
+
+    - Check the deleted `docs/DOCKER_PUBLISHING.md` against relevant sections in the new `README.md` (the content of which came from `README_BOILERPLATE.md`) to see if there isn't anything useful that could be incorporated into those sections of the README.md.
+    - Look through EVERYTHING: deleted files, modified files, added files; in case of modified files, look through both - the old and the new versions of the changed lines.
+
+    **The goal is to see if there isn't anything that needs to be incorporated from the non-boilerplate version into the boilerplate version MANUALLY.**
+
+
 ### Final steps
 
 17. Take a moment to think if nothing was forgotten (e.g. something new was introduced, which this guide doesn't cover yet).
 
-18. SQUASH and merge `boilerplate-MANUAL-merging-branch` into `boilerplate-merging-branch` using the Pull Request created in step 15:
+18. SQUASH and merge `boilerplate-MANUAL-merging-branch` into `boilerplate-merging-branch` using the Pull Request that you created:
 
     ```bash
     gh pr merge --squash --delete-branch --auto
     ```
 
-19. **Thoroughly test `boilerplate-merging-branch`.**
-
-20. Create a GitHub Pull Request of `boilerplate-merging-branch` into `main-boilerplate`:
+19. Create a GitHub Pull Request of `boilerplate-merging-branch` into `main-boilerplate`:
 
     ```bash
     gh pr create \
@@ -330,15 +331,19 @@ So, in order to conclude the conversion, do the following:
 
     (Or do this through the GitHub web interface, if you prefer.)
 
-21. Merge `boilerplate-merging-branch` into `main-boilerplate` using the Pull Request created in step 20. **DO NOT SQUASH, DO A MERGE COMMIT INSTEAD!** We want `main-boilerplate` to be marked as in-sync with the `main` branch:
+20. **Review the PR for the final `boilerplate-merging-branch` as well.**
+
+21. **Test `boilerplate-merging-branch`.**
+
+22. Merge `boilerplate-merging-branch` into `main-boilerplate` using the Pull Request that you created. **DO NOT SQUASH, DO A MERGE COMMIT INSTEAD!** We want `main-boilerplate` to be marked as in-sync with the `main` branch:
 
     ```bash
     gh pr merge --delete-branch --auto
     ```
 
-22. **Do a very shallow test of `main-boilerplate`.** (Proper testing was performed in step 19.)
+23. **Test `main-boilerplate` after the final merge.**
 
-23. Tag the new version:
+24. Tag the new version:
 
     ```bash
     git tag -a X.X.X.X -m "Release X.X.X.X" # Replace with the actual version number
@@ -346,19 +351,20 @@ So, in order to conclude the conversion, do the following:
     git status
     ```
 
-24. Go to the GitHub Releases page and create a new release:
+25. Go to the GitHub Releases page and create a new release:
+
     - **Title:** `X.X.X.X (boilerplate release)`
     - **Description:** \<release notes\>
     - **Discussion:** create a new discussion
     - **Mark as latest:** FALSE
 
-25. Login to GHCR:
+26. Login to GHCR:
 
     ```bash
     echo <YOUR_GITHUB_PAT> | docker login ghcr.io -u <YOUR_GITHUB_USERNAME> --password-stdin
     ```
 
-26. Build the `litellm-server-yoda` image and push it to GHCR:
+27. Build the `litellm-server-yoda` image and push it to GHCR:
 
     ```bash
     docker buildx build \
@@ -369,7 +375,7 @@ So, in order to conclude the conversion, do the following:
       --push .
     ```
 
-27. Build the `librechat-yoda` image and push it to GHCR:
+28. Build the `librechat-yoda` image and push it to GHCR:
 
     ```bash
     docker buildx build \
