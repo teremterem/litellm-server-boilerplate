@@ -1,4 +1,5 @@
 litellm_settings:
+  custom_provider_map:
   - provider: yoda_speak
     custom_handler: yoda_example.yoda_speak.yoda_speak_llm
 
