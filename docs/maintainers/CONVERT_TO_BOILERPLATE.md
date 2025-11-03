@@ -72,9 +72,9 @@ cd <repo-root-dir>
    git push --set-upstream origin boilerplate-merging-branch
    ```
 
-4. Merge `main` branch into this feature branch in the following way:
+4. Merge `main` into `boilerplate-merging-branch` in the following way:
 
-   2.1 Switch to the feature branch and **initiate the merge** of the `main`:
+   2.1 Initiate the merge:
 
    ```bash
    git merge origin/main
