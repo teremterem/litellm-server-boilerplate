@@ -20,7 +20,7 @@ cd <repo-root-dir>
    rm -r ../repo-main-backup-dir
    ```
 
-   Proceed with the backup:
+   **Proceed with the backup:**
 
    ```bash
    git switch main
@@ -44,7 +44,7 @@ cd <repo-root-dir>
    rm -r ../repo-boilerplate-backup-dir
    ```
 
-   Proceed with the backup:
+   **Proceed with the backup:**
 
    ```bash
    git switch main-boilerplate
