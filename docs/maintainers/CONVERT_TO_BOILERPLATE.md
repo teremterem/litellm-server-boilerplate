@@ -338,7 +338,7 @@ So, in order to conclude the conversion, do the following.
 22. Merge `boilerplate-merging-branch` into `main-boilerplate` using the Pull Request that you created. **DO NOT SQUASH, DO A MERGE COMMIT INSTEAD!** We want `main-boilerplate` to be marked as in-sync with the `main` branch:
 
     ```bash
-    gh pr merge --delete-branch --auto
+    gh pr merge --merge --delete-branch --auto
     ```
 
 23. **Test `main-boilerplate` after the final merge.**
