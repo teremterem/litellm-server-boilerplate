@@ -395,6 +395,7 @@ So, in order to conclude the conversion, do the following.
     ```
 
     ```bash
+    git diff
     git status
     ```
 
