@@ -12,9 +12,9 @@ This guide is intended for the maintainers of the Claude Code GPT-5 repository t
 
 2. **Test the `main` branch after all the final merges and/or commits were done.**
 
-3. **Prepare and release the Boilerplate version of the project by following the steps in `docs/maintainers/CONVERT_TO_BOILERPLATE.md` from the beginning to the end before coming back to this guide.**
+3. **Prepare and release the Boilerplate version of the project by following the steps in [CONVERT_TO_BOILERPLATE.md](CONVERT_TO_BOILERPLATE.md) from the beginning to the end before coming back to this guide.**
 
-4. Make sure you are back on the `main` branch:
+4. Make sure you are on the `main` branch again:
 
    ```bash
    git switch main
