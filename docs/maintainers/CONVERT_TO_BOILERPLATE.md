@@ -394,9 +394,13 @@ So, in order to conclude the conversion, do the following.
     vim librechat/docker-compose.override.yml
     ```
 
-31. **TEST THE PUBLISHED IMAGES.**
+31. **TEST THE PUBLISHED IMAGES:**
 
-32. Get rid of the changes from the previous step:
+    ```bash
+    ./librechat/run-docker-compose.sh --pull always
+    ```
+
+33. Get rid of the changes from the previous step:
 
     ```bash
     git checkout librechat/docker-compose.override.yml
