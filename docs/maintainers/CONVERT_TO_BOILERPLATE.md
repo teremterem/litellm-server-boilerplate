@@ -392,12 +392,11 @@ So, in order to conclude the conversion, do the following.
 
     ```bash
     vim librechat/docker-compose.override.yml
+    git diff
     ```
 
-    ```bash
-    git diff
-    git status
-    ```
+vim librechat/docker-compose.override.yml
+git diff
 
 31. **TEST THE PUBLISHED IMAGES:**
 
