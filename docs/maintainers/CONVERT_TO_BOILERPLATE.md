@@ -394,6 +394,10 @@ So, in order to conclude the conversion, do the following.
     vim librechat/docker-compose.override.yml
     ```
 
+    ```bash
+    git status
+    ```
+
 31. **TEST THE PUBLISHED IMAGES:**
 
     ```bash
