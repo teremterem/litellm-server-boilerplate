@@ -71,7 +71,9 @@ This guide is intended for the maintainers of the Claude Code GPT-5 repository t
 
    > **NOTE:** If publishing for the first time, then, after you published it with the command above, make sure to make the package public in [GHCR package settings](https://github.com/users/teremterem/packages/container/claude-code-gpt-5/settings) and also [connect it to the project repository](https://github.com/users/teremterem/packages/container/package/claude-code-gpt-5).
 
-9. **Test the published Docker image by running the `run-docker.sh` ( and/or `deploy-docker.sh`) script.**
+9. **NAVIGATE to the Packages tab in GitHub and visually inspect that the image was published with proper version tags.**
+
+10. **TEST the published Docker image by running the `run-docker.sh` ( and/or `deploy-docker.sh`) script.**
 
 ---
 
