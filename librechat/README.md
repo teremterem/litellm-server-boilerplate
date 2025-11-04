@@ -1,4 +1,4 @@
-# librechat/
+# The `librechat/` folder
 
 This folder contains a self-contained LibreChat stack wired to the LiteLLM server in the repository root. It provides compose definitions, a minimal Dockerfile for baking configuration, and the LibreChat application config that points LibreChat to the local LiteLLM endpoint.
 
