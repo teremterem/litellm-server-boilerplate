@@ -395,9 +395,6 @@ So, in order to conclude the conversion, do the following.
     git diff
     ```
 
-vim librechat/docker-compose.override.yml
-git diff
-
 31. **TEST THE PUBLISHED IMAGES:**
 
     ```bash
