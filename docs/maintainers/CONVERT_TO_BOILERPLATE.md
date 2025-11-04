@@ -114,8 +114,7 @@ cd <repo-root-dir>
 
    ```bash
    rm -rf claude_code_proxy/
-   rm docs/maintainers/DOCKER_PUBLISHING.md
-   rm docs/maintainers/CONVERT_TO_BOILERPLATE.md
+   rm -rf docs/maintainers/
    rm images/claude-code-gpt-5.jpeg
    rm deploy-docker.sh
    rm kill-docker.sh
@@ -124,17 +123,6 @@ cd <repo-root-dir>
    git add --all
    git status
    ```
-
-   If there is no other relevant stuff in `docs/maintainers/` folder, then delete it altogether:
-
-   ```bash
-   rm -rf docs/maintainers/
-
-   git add --all
-   git status
-   ```
-
-   Commit and push:
 
    ```bash
    git commit -m "Delete irrelevant files"
@@ -303,11 +291,10 @@ So, in order to conclude the conversion, do the following.
 
     Things to look for:
 
-    - Check the deleted `docs/DOCKER_PUBLISHING.md` against relevant sections in the new `README.md` (the content of which came from `README_BOILERPLATE.md`) to see if there isn't anything useful that could be incorporated into those sections of the README.md.
+    - Check the deleted `docs/maintainers/RELEASE.md` against relevant sections in the new `README.md` (the content of which came from `README_BOILERPLATE.md`) to see if there isn't anything useful that could be incorporated into those sections of the README.md.
     - Look through EVERYTHING: deleted files, modified files, added files; in case of modified files, look through both - the old and the new versions of the changed lines.
 
     **The goal is to see if there isn't anything that needs to be incorporated from the non-boilerplate version into the boilerplate version MANUALLY.**
-
 
 ### Final steps
 
@@ -346,7 +333,7 @@ So, in order to conclude the conversion, do the following.
 24. Tag the new version:
 
     ```bash
-    git tag -a X.X.X.X  # Replace with the actual version number
+    git tag -a <X.X.X.X>  # Replace <X.X.X.X>
     ```
 
     ```bash
@@ -364,7 +351,8 @@ So, in order to conclude the conversion, do the following.
 26. Login to GHCR:
 
     ```bash
-    echo <YOUR_GITHUB_PAT> | docker login ghcr.io -u <YOUR_GITHUB_USERNAME> --password-stdin
+    # Replace <GITHUB_PAT> and <GITHUB_USERNAME>
+    echo <GITHUB_PAT> | docker login ghcr.io -u <GITHUB_USERNAME> --password-stdin
     ```
 
 27. Build the `litellm-server-yoda` image and push it to GHCR:
@@ -372,8 +360,8 @@ So, in order to conclude the conversion, do the following.
     ```bash
     docker buildx build \
       --platform linux/amd64,linux/arm64 \
-      -t ghcr.io/teremterem/litellm-server-yoda:<X.X.X.X> \
-      -t ghcr.io/teremterem/litellm-server-yoda:<X.X.X> \
+      -t ghcr.io/teremterem/litellm-server-yoda:<X.X.X.X> \  # Replace <X.X.X.X>
+      -t ghcr.io/teremterem/litellm-server-yoda:<X.X.X> \  # Replace <X.X.X>
       -t ghcr.io/teremterem/litellm-server-yoda:latest \
       --push .
     ```
@@ -383,8 +371,12 @@ So, in order to conclude the conversion, do the following.
     ```bash
     docker buildx build \
       --platform linux/amd64,linux/arm64 \
-      -t ghcr.io/teremterem/librechat-yoda:<X.X.X.X> \
-      -t ghcr.io/teremterem/librechat-yoda:<X.X.X> \
+      -t ghcr.io/teremterem/librechat-yoda:<X.X.X.X> \  # Replace <X.X.X.X>
+      -t ghcr.io/teremterem/librechat-yoda:<X.X.X> \  # Replace <X.X.X>
       -t ghcr.io/teremterem/librechat-yoda:latest \
       --push .
     ```
+
+---
+
+That's it! You have converted the Claude Code GPT-5 Proxy to a Boilerplate version (aka My LiteLLM Server) and published the Docker images to GHCR. Now you can go back to the [RELEASE.md](RELEASE.md) guide to release the new version of the Claude Code GPT-5 Proxy itself.
