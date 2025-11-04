@@ -2,6 +2,12 @@
 
 This guide is intended for the maintainers of the Claude Code GPT-5 repository to derive a "Boilerplate" version of it (aka My LiteLLM Server) upon a new version release. **If you are simply looking to use it as a boilerplate, head over to the [main-boilerplate](https://github.com/teremterem/claude-code-gpt-5/tree/main-boilerplate) branch of this repository and check out the [README](https://github.com/teremterem/claude-code-gpt-5/blob/main-boilerplate/README.md) there.**
 
+## Prerequisites
+
+- A GitHub [Personal Access Token (PAT)](https://github.com/settings/tokens) with the `write:packages` scope
+- Docker installed on your machine
+- Multi-arch `buildx` enabled in Docker (see [Docker documentation](https://docs.docker.com/build/install-buildx/))
+
 ## Steps
 
 > **NOTE:** All the commands below are expected to be run from the root directory of the repository:
@@ -350,7 +356,7 @@ So, in order to conclude the conversion, do the following.
 
 26. Login to GHCR:
 
-    > **NOTE:** You need a GitHub [Personal Access Token (PAT)](https://github.com/settings/tokens) with the `write:packages` scope.
+    > **NOTE:** At this point you need a GitHub [Personal Access Token (PAT)](https://github.com/settings/tokens) with the `write:packages` scope.
 
     ```bash
     # Replace <GITHUB_PAT> and <GITHUB_USERNAME>
