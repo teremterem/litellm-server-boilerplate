@@ -382,7 +382,8 @@ So, in order to conclude the conversion, do the following.
       -t ghcr.io/teremterem/librechat-yoda:<X.X.X.X> \  # Replace <X.X.X.X>
       -t ghcr.io/teremterem/librechat-yoda:<X.X.X> \  # Replace <X.X.X>
       -t ghcr.io/teremterem/librechat-yoda:latest \
-      --push .
+      --push \
+      librechat/
     ```
 
 29. Modify `librechat/docker-compose.override.yml` according to instruction in its own comments so it uses the published `litellm-server-yoda` and `librechat-yoda` images instead of your local source files:
