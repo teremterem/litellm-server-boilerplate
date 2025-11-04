@@ -350,6 +350,8 @@ So, in order to conclude the conversion, do the following.
 
 26. Login to GHCR:
 
+    > **NOTE:** You need a GitHub [Personal Access Token (PAT)](https://github.com/settings/tokens) with the `write:packages` scope.
+
     ```bash
     # Replace <GITHUB_PAT> and <GITHUB_USERNAME>
     echo <GITHUB_PAT> | docker login ghcr.io -u <GITHUB_USERNAME> --password-stdin
