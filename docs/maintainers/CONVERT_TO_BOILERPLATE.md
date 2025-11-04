@@ -385,6 +385,21 @@ So, in order to conclude the conversion, do the following.
       --push .
     ```
 
+29. Modify `librechat/docker-compose.override.yml` according to instruction in its own comments so it uses the published `litellm-server-yoda` and `librechat-yoda` images instead of your local source files:
+
+    ```bash
+    vim librechat/docker-compose.override.yml
+    ```
+
+30. **TEST THE PUBLISHED IMAGES.**
+
+31. Get rid of the changes from the previous step:
+
+    ```bash
+    git checkout librechat/docker-compose.override.yml
+    git status
+    ```
+
 ---
 
 That's it! You have converted the Claude Code GPT-5 Proxy to a Boilerplate version (aka My LiteLLM Server) and published the Docker images to GHCR. Now you can go back to the [RELEASE.md](RELEASE.md) guide to release the new version of the Claude Code GPT-5 Proxy itself.
