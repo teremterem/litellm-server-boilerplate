@@ -76,7 +76,7 @@ This guide is intended for the maintainers of the Claude Code GPT-5 repository t
 10. **TEST THE PUBLISHED IMAGE:**
 
 ```bash
-docker run -d \
+docker run \
   --name claude-code-gpt-5 \
   -p 4000:4000 \
   --env-file .env \
