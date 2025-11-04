@@ -2,6 +2,14 @@
 
 This guide is intended for the maintainers of the Claude Code GPT-5 repository to release a new version of the Claude Code GPT-5 Proxy. The starting point of this guide is the moment after all the relevant changes have been merged into the `main` branch (being tested before the merge, of course).
 
+## Prerequisites
+
+- A GitHub [Personal Access Token (PAT)](https://github.com/settings/tokens) with the `write:packages` scope
+- Docker installed on your machine
+- Multi-arch `buildx` enabled in Docker (see [Docker documentation](https://docs.docker.com/build/install-buildx/))
+
+## Steps
+
 1. Make sure you are on the `main` branch:
 
    ```bash
@@ -22,7 +30,7 @@ This guide is intended for the maintainers of the Claude Code GPT-5 repository t
    git status
    ```
 
-## Create a new release in GitHub
+### Create a new release in GitHub
 
 5. Tag the new version and push the tags to the remote repository:
 
@@ -42,15 +50,7 @@ This guide is intended for the maintainers of the Claude Code GPT-5 repository t
    - **Discussion:** create a new discussion
    - **Mark as latest:** TRUE
 
-## Publish a Docker image to GHCR
-
-### Prerequisites
-
-- A GitHub [Personal Access Token (PAT)](https://github.com/settings/tokens) with the `write:packages` scope
-- Docker installed on your machine
-- Multi-arch `buildx` enabled in Docker (see [Docker documentation](https://docs.docker.com/build/install-buildx/))
-
-### Steps
+### Publish a Docker image to GHCR
 
 7. Login to GHCR:
 
