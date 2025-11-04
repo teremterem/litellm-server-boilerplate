@@ -73,7 +73,17 @@ This guide is intended for the maintainers of the Claude Code GPT-5 repository t
 
 9. **NAVIGATE to the Packages tab in GitHub and visually inspect that the image was published with proper version tags.**
 
-10. **TEST the published Docker image by running the `run-docker.sh` ( and/or `deploy-docker.sh`) script.**
+10. **TEST THE PUBLISHED IMAGE:**
+
+```bash
+docker run -d \
+  --name claude-code-gpt-5 \
+  -p 4000:4000 \
+  --env-file .env \
+  --restart unless-stopped \
+  --pull always \
+  ghcr.io/teremterem/claude-code-gpt-5:latest
+```
 
 ---
 
