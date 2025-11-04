@@ -386,15 +386,17 @@ So, in order to conclude the conversion, do the following.
       librechat/
     ```
 
-29. Modify `librechat/docker-compose.override.yml` according to instruction in its own comments so it uses the published `litellm-server-yoda` and `librechat-yoda` images instead of your local source files:
+29. **Navigate to the Packages tab in GitHub and visually inspect that both images are published normally with proper version tags.**
+
+30. Modify `librechat/docker-compose.override.yml` according to instruction in its own comments so it uses the published `litellm-server-yoda` and `librechat-yoda` images instead of your local source files:
 
     ```bash
     vim librechat/docker-compose.override.yml
     ```
 
-30. **TEST THE PUBLISHED IMAGES.**
+31. **TEST THE PUBLISHED IMAGES.**
 
-31. Get rid of the changes from the previous step:
+32. Get rid of the changes from the previous step:
 
     ```bash
     git checkout librechat/docker-compose.override.yml
