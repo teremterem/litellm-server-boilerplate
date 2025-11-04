@@ -346,7 +346,10 @@ So, in order to conclude the conversion, do the following.
 24. Tag the new version:
 
     ```bash
-    git tag -a X.X.X.X -m "Release X.X.X.X" # Replace with the actual version number
+    git tag -a X.X.X.X  # Replace with the actual version number
+    ```
+
+    ```bash
     git push --tags
     git status
     ```
