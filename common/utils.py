@@ -1,12 +1,12 @@
 # pylint: disable=too-many-branches,too-many-locals,too-many-statements,too-many-return-statements
 # pylint: disable=too-many-nested-blocks
-import os
 """
 NOTE: The utilities in this module were mostly vibe-coded without review.
 """
+import json
+import os
 from copy import deepcopy
 from datetime import UTC, datetime
-import json
 from typing import Any, Optional, Union
 
 from litellm import GenericStreamingChunk, ModelResponse, ResponsesAPIResponse
@@ -18,8 +18,8 @@ class ProxyError(RuntimeError):
         final_highlight: bool
         if highlight is None:
             # No value provided, read from env var (default 'True')
-            env_val = os.environ.get('PROXY_ERROR_HIGHLIGHT', 'True')
-            final_highlight = env_val.lower() not in ('false', '0', 'no')
+            env_val = os.environ.get("PROXY_ERROR_HIGHLIGHT", "True")
+            final_highlight = env_val.lower() not in ("false", "0", "no")
         else:
             # Value was provided, use it
             final_highlight = highlight
@@ -30,6 +30,7 @@ class ProxyError(RuntimeError):
             super().__init__(f"\033[1;31m{error}\033[0m")
         else:
             super().__init__(error)
+
 
 def env_var_to_bool(value: Optional[str], default: str = "false") -> bool:
     """
