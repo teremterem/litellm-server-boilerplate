@@ -324,9 +324,9 @@ So, in order to conclude the conversion, do the following.
 
     (Or do this through the GitHub web interface, if you prefer.)
 
-20. **Review the PR for the final `boilerplate-merging-branch` as well.**
+20. **REVIEW the PR for the final `boilerplate-merging-branch` as well.**
 
-21. **Test `boilerplate-merging-branch`.**
+21. **TEST `boilerplate-merging-branch`.**
 
 22. Merge `boilerplate-merging-branch` into `main-boilerplate` using the Pull Request that you created. **DO NOT SQUASH, DO A MERGE COMMIT INSTEAD!** We want `main-boilerplate` to be marked as in-sync with the `main` branch:
 
@@ -334,7 +334,7 @@ So, in order to conclude the conversion, do the following.
     gh pr merge --merge --delete-branch
     ```
 
-23. **Test `main-boilerplate` after the final merge.**
+23. **TEST `main-boilerplate` after the final merge.**
 
 24. Tag the new version:
 
