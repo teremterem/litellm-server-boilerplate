@@ -417,10 +417,33 @@ def convert_chat_messages_to_respapi(messages: list[Any]) -> list[dict[str, Any]
         if not isinstance(role, str) or not role:
             raise ValueError(f"Chat message at index {idx} is missing a valid role")
 
-        # SPECIAL CASE: tool results must be encoded as function_call_output for Responses API
+        # Assistant tool calls -> function_call items
+        if role == "assistant":
+            tool_calls = message.get("tool_calls")
+            if isinstance(tool_calls, list) and tool_calls:
+                for tc in tool_calls:
+                    try:
+                        call_id = tc.get("id") or tc.get("call_id") or tc.get("tool_call_id")
+                        fn = tc.get("function") or {}
+                        name = fn.get("name") or tc.get("name")
+                        arguments = fn.get("arguments") or tc.get("arguments") or ""
+                        if not isinstance(arguments, str):
+                            try:
+                                arguments = json.dumps(arguments)
+                            except Exception:
+                                arguments = str(arguments)
+                        converted.append({
+                            "type": "function_call",
+                            "call_id": call_id,
+                            "name": name,
+                            "arguments": arguments,
+                        })
+                    except Exception:
+                        continue
+
+        # Tool results -> function_call_output items
         if role == "tool":
             call_id = message.get("tool_call_id") or message.get("call_id")
-            # Flatten tool output to a string; Claude Code sends content as string or list
             content = message.get("content")
             if isinstance(content, list):
                 output_str = _flatten_responses_text(content)
@@ -432,22 +455,19 @@ def convert_chat_messages_to_respapi(messages: list[Any]) -> list[dict[str, Any]
                 except Exception:
                     output_str = str(content)
 
-            new_item: dict[str, Any] = {
+            converted.append({
                 "type": "function_call_output",
                 "call_id": call_id,
                 "output": output_str or "",
-            }
-            # Preserve index ordering; Responses does not need role here
-            converted.append(new_item)
+            })
             continue
 
         # Drop tool_calls and function_call - Responses API doesn't support these in message content
-        # Tool results are preserved in tool role messages with tool_result type
+        # We already emitted function_call / function_call_output items above.
         keys_to_exclude = {"content"} | _MESSAGE_KEYS_TO_DROP
         new_message: dict[str, Any] = {k: deepcopy(v) for k, v in message.items() if k not in keys_to_exclude}
 
-        # Convert role: "tool" to "user" for Responses API
-        # Responses API only supports: assistant, system, developer, user
+        # Responses API supports: assistant, system, developer, user
         normalized_role = role
 
         content = message.get("content")
@@ -702,11 +722,20 @@ def _try_parse_responses_chunk(chunk: Any) -> Optional[dict[str, Any]]:
             text = content_candidate
 
     if not text:
-        response_obj = _get(chunk, "response")
-        if isinstance(response_obj, dict):
-            output_text = response_obj.get("output_text")
-            if isinstance(output_text, list):
-                text = "".join([part for part in output_text if isinstance(part, str)])
+        # Avoid re-emitting consolidated assistant text on structural/aggregate events, which
+        # would duplicate already-streamed output_text.delta content.
+        if chunk_type not in {
+            "response.created",
+            "response.in_progress",
+            "response.completed",
+            "response.output_item.added",
+            "response.output_item.done",
+        }:
+            response_obj = _get(chunk, "response")
+            if isinstance(response_obj, dict):
+                output_text = response_obj.get("output_text")
+                if isinstance(output_text, list):
+                    text = "".join([part for part in output_text if isinstance(part, str)])
 
     tool_use = None
 
