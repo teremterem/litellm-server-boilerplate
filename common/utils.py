@@ -10,6 +10,7 @@ from datetime import UTC, datetime
 from typing import Any, Optional, Union
 
 from litellm import GenericStreamingChunk, ModelResponse, ResponsesAPIResponse
+import json as _json_for_telemetry
 
 
 class ProxyError(RuntimeError):
@@ -51,6 +52,14 @@ _RESPONSES_TOOL_STATE: dict[str, dict[str, Any]] = {}
 # We only ever emit a single tool_use for the adopted item.
 _RESPONSES_TOOL_ADOPTED: Optional[str] = None
 _RESPONSES_TOOL_DEBUG = os.environ.get("RESPONSES_TOOL_DEBUG", "0") not in ("0", "", "false", "False")
+_RESPONSES_TELEMETRY_ENABLED = os.environ.get("RESPONSES_TOOL_TELEMETRY", "0") not in ("0", "", "false", "False")
+
+_RESPONSES_TELEMETRY: dict[str, Any] = {
+    "saw_tool_items": 0,
+    "extra_tool_items_ignored": 0,
+    "adopted_item_id": None,
+    "adopted_output_index": None,
+}
 
 
 def _log_responses_tool(msg: str) -> None:
@@ -58,6 +67,16 @@ def _log_responses_tool(msg: str) -> None:
         return
     timestamp = datetime.now(UTC).isoformat()
     print(f"[responses_tool_debug {timestamp}] {msg}")
+
+
+def _telemetry(event: str, **fields: Any) -> None:
+    if not _RESPONSES_TELEMETRY_ENABLED:
+        return
+    payload = {"event": event, **fields}
+    try:
+        print(f"[responses_tool_telemetry] {_json_for_telemetry.dumps(payload, ensure_ascii=False)}")
+    except Exception:
+        print(f"[responses_tool_telemetry] {event} {fields}")
 
 
 def _maybe_emit_tool(item_id: str, default_index: int = 0) -> Optional[dict[str, Any]]:
@@ -409,6 +428,7 @@ def convert_chat_messages_to_respapi(messages: list[Any]) -> list[dict[str, Any]
         raise TypeError("messages must be provided as a list")
 
     converted: list[dict[str, Any]] = []
+    last_func_call_id: Optional[str] = None
     for idx, message in enumerate(messages):
         if not isinstance(message, dict):
             raise TypeError(f"Chat message at index {idx} must be a mapping")
@@ -432,18 +452,30 @@ def convert_chat_messages_to_respapi(messages: list[Any]) -> list[dict[str, Any]
                                 arguments = json.dumps(arguments)
                             except Exception:
                                 arguments = str(arguments)
+                        # Fallback: if no call_id, synthesize a stable id for this turn
+                        if not isinstance(call_id, str) or not call_id:
+                            # Try to peek ahead for the next 'tool' message's tool_call_id
+                            peek_id = None
+                            for j in range(idx + 1, len(messages)):
+                                mj = messages[j]
+                                if isinstance(mj, dict) and mj.get("role") == "tool":
+                                    peek_id = mj.get("tool_call_id") or mj.get("call_id")
+                                    if peek_id:
+                                        break
+                            call_id = peek_id or f"fc_{idx}"
                         converted.append({
                             "type": "function_call",
                             "call_id": call_id,
                             "name": name,
                             "arguments": arguments,
                         })
+                        last_func_call_id = call_id
                     except Exception:
                         continue
 
         # Tool results -> function_call_output items
         if role == "tool":
-            call_id = message.get("tool_call_id") or message.get("call_id")
+            call_id = message.get("tool_call_id") or message.get("call_id") or last_func_call_id or f"fc_{idx}"
             content = message.get("content")
             if isinstance(content, list):
                 output_str = _flatten_responses_text(content)
@@ -702,40 +734,20 @@ def _try_parse_responses_chunk(chunk: Any) -> Optional[dict[str, Any]]:
         candidate_index = _get(chunk, "index")
         index = candidate_index if isinstance(candidate_index, int) else 0
 
-    delta = _get(chunk, "delta")
+    # Only stream assistant text for explicit output_text.delta events
     text = ""
-    if isinstance(delta, str):
-        text = delta
-    elif isinstance(delta, dict):
-        delta_text = delta.get("text")
-        if isinstance(delta_text, str):
-            text = delta_text
+    chunk_delta = _get(chunk, "delta")
+    if chunk_type == "response.output_text.delta":
+        if isinstance(chunk_delta, str):
+            text = chunk_delta
+        elif isinstance(chunk_delta, dict):
+            delta_text = chunk_delta.get("text")
+            if isinstance(delta_text, str):
+                text = delta_text
 
-    if not text:
-        text_candidate = _get(chunk, "text")
-        if isinstance(text_candidate, str):
-            text = text_candidate
+    # Do not pull text from generic 'text' or 'content' fields; only output_text.delta carries assistant text
 
-    if not text:
-        content_candidate = _get(chunk, "content")
-        if isinstance(content_candidate, str):
-            text = content_candidate
-
-    if not text:
-        # Avoid re-emitting consolidated assistant text on structural/aggregate events, which
-        # would duplicate already-streamed output_text.delta content.
-        if chunk_type not in {
-            "response.created",
-            "response.in_progress",
-            "response.completed",
-            "response.output_item.added",
-            "response.output_item.done",
-        }:
-            response_obj = _get(chunk, "response")
-            if isinstance(response_obj, dict):
-                output_text = response_obj.get("output_text")
-                if isinstance(output_text, list):
-                    text = "".join([part for part in output_text if isinstance(part, str)])
+    # Never flatten aggregated output_text on structural events to avoid duplication
 
     tool_use = None
 
@@ -822,6 +834,12 @@ def _try_parse_responses_chunk(chunk: Any) -> Optional[dict[str, Any]]:
                 _log_responses_tool(
                     f"output_item.added item_id={item_id_for_state} name={state.get('name')} call_id={state.get('id')}"
                 )
+                _RESPONSES_TELEMETRY["saw_tool_items"] = _RESPONSES_TELEMETRY.get("saw_tool_items", 0) + 1
+                if _RESPONSES_TOOL_ADOPTED is None and isinstance(item_id_for_state, str):
+                    _RESPONSES_TELEMETRY["adopted_item_id"] = item_id_for_state
+                    _RESPONSES_TELEMETRY["adopted_output_index"] = index
+                elif _RESPONSES_TOOL_ADOPTED is not None and isinstance(item_id_for_state, str) and _RESPONSES_TOOL_ADOPTED != item_id_for_state:
+                    _RESPONSES_TELEMETRY["extra_tool_items_ignored"] = _RESPONSES_TELEMETRY.get("extra_tool_items_ignored", 0) + 1
                 tool_use = _maybe_emit_tool(item_id_for_state, default_index=index)
 
     # Accumulate streaming function_call arguments
@@ -994,8 +1012,8 @@ def _try_parse_responses_chunk(chunk: Any) -> Optional[dict[str, Any]]:
         value = _get(chunk, key)
         if value is not None:
             provider_specific_fields[key] = deepcopy(value)
-    if isinstance(delta, dict):
-        provider_specific_fields["delta"] = deepcopy(delta)
+    if isinstance(chunk_delta, dict):
+        provider_specific_fields["delta"] = deepcopy(chunk_delta)
     if not provider_specific_fields:
         provider_specific_fields = None
 
