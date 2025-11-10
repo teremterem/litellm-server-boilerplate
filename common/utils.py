@@ -45,6 +45,9 @@ def env_var_to_bool(value: Optional[str], default: str = "false") -> bool:
     """
     return (value or default).lower() in ("true", "1", "on", "yes", "y")
 
+# Minimal state to accumulate Responses function_call arguments across chunks
+_RESPONSES_TOOL_STATE: dict[str, dict[str, Any]] = {}
+
 
 def generate_timestamp_utc() -> str:
     """
@@ -636,6 +639,93 @@ def _try_parse_responses_chunk(chunk: Any) -> Optional[dict[str, Any]]:
                 text = "".join([part for part in output_text if isinstance(part, str)])
 
     tool_use = None
+
+    # Handle Responses tool/function call start event: response.output_item.added
+    if chunk_type == "response.output_item.added":
+        item = _get(chunk, "item")
+        if isinstance(item, dict):
+            item_type = _get(item, "type")
+            if item_type in {"function_call", "tool_call"}:
+                name = _get(item, "name") or _get(item, "function_name")
+                call_id = _get(item, "id") or _get(item, "call_id") or _get(item, "tool_call_id")
+                # Track this function call by its item id
+                item_id_for_state = _get(item, "id")
+                if isinstance(item_id_for_state, str) and item_id_for_state:
+                    _RESPONSES_TOOL_STATE[item_id_for_state] = {
+                        "name": name if isinstance(name, str) else None,
+                        "id": call_id if isinstance(call_id, str) else None,
+                        "args": "",
+                        "index": index,
+                    }
+                tool_use = {
+                    "index": index,
+                    "id": call_id if isinstance(call_id, str) else None,
+                    "type": "function",
+                    "function": {
+                        "name": name if isinstance(name, str) else None,
+                        # Arguments will be provided via subsequent *.function_call_arguments.delta events
+                        "arguments": "",
+                    },
+                }
+
+    # Accumulate streaming function_call arguments
+    if chunk_type == "response.function_call_arguments.delta":
+        item_id = _get(chunk, "item_id")
+        delta_text = _get(chunk, "delta")
+        if isinstance(item_id, str) and isinstance(delta_text, str):
+            state = _RESPONSES_TOOL_STATE.get(item_id)
+            if state is None:
+                state = {"name": None, "id": None, "args": "", "index": index}
+                _RESPONSES_TOOL_STATE[item_id] = state
+            state["args"] = (state.get("args") or "") + delta_text
+            tool_use = {
+                "index": state.get("index", index),
+                "id": state.get("id"),
+                "type": "function",
+                "function": {
+                    "name": state.get("name"),
+                    "arguments": state.get("args", ""),
+                },
+            }
+
+    # Finalize args on done
+    if chunk_type == "response.function_call_arguments.done":
+        item_id = _get(chunk, "item_id")
+        if isinstance(item_id, str) and item_id in _RESPONSES_TOOL_STATE:
+            state = _RESPONSES_TOOL_STATE[item_id]
+            tool_use = {
+                "index": state.get("index", index),
+                "id": state.get("id"),
+                "type": "function",
+                "function": {
+                    "name": state.get("name"),
+                    "arguments": state.get("args", ""),
+                },
+            }
+            # keep state until output_item.done to allow consumers to see finalized call
+
+    if chunk_type == "response.output_item.done":
+        item = _get(chunk, "item")
+        if isinstance(item, dict):
+            item_type = _get(item, "type")
+            if item_type in {"function_call", "tool_call"}:
+                item_id = _get(item, "id")
+                if isinstance(item_id, str) and item_id in _RESPONSES_TOOL_STATE:
+                    state = _RESPONSES_TOOL_STATE[item_id]
+                    tool_use = {
+                        "index": state.get("index", index),
+                        "id": state.get("id"),
+                        "type": "function",
+                        "function": {
+                            "name": state.get("name"),
+                            "arguments": state.get("args", ""),
+                        },
+                    }
+                    try:
+                        del _RESPONSES_TOOL_STATE[item_id]
+                    except Exception:
+                        pass
+
     if "tool_call" in chunk_type or "function_call" in chunk_type:
         payloads: list[dict[str, Any]] = []
         if isinstance(delta, dict):
