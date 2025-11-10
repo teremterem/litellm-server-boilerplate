@@ -348,7 +348,9 @@ _TOOL_TYPE_ALIASES = {
 
 _CONTENT_KEYS_TO_DROP = {"cache_control"}
 
-_MESSAGE_KEYS_TO_DROP = {"tool_calls", "function_call", "tool_call_id"}
+# For regular messages we drop tool_calls / function_call content; tool_call_id is handled
+# explicitly when role == "tool" and converted to function_call_output.
+_MESSAGE_KEYS_TO_DROP = {"tool_calls", "function_call"}
 
 _FUNCTION_METADATA_KEYS = ("description", "parameters", "strict")
 
@@ -415,6 +417,30 @@ def convert_chat_messages_to_respapi(messages: list[Any]) -> list[dict[str, Any]
         if not isinstance(role, str) or not role:
             raise ValueError(f"Chat message at index {idx} is missing a valid role")
 
+        # SPECIAL CASE: tool results must be encoded as function_call_output for Responses API
+        if role == "tool":
+            call_id = message.get("tool_call_id") or message.get("call_id")
+            # Flatten tool output to a string; Claude Code sends content as string or list
+            content = message.get("content")
+            if isinstance(content, list):
+                output_str = _flatten_responses_text(content)
+            elif isinstance(content, str):
+                output_str = content
+            else:
+                try:
+                    output_str = json.dumps(content)
+                except Exception:
+                    output_str = str(content)
+
+            new_item: dict[str, Any] = {
+                "type": "function_call_output",
+                "call_id": call_id,
+                "output": output_str or "",
+            }
+            # Preserve index ordering; Responses does not need role here
+            converted.append(new_item)
+            continue
+
         # Drop tool_calls and function_call - Responses API doesn't support these in message content
         # Tool results are preserved in tool role messages with tool_result type
         keys_to_exclude = {"content"} | _MESSAGE_KEYS_TO_DROP
@@ -423,9 +449,6 @@ def convert_chat_messages_to_respapi(messages: list[Any]) -> list[dict[str, Any]
         # Convert role: "tool" to "user" for Responses API
         # Responses API only supports: assistant, system, developer, user
         normalized_role = role
-        if role == "tool":
-            normalized_role = "user"
-            new_message["role"] = "user"
 
         content = message.get("content")
         new_message["content"] = _normalize_message_content(normalized_role, content)
