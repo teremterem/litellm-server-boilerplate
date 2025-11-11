@@ -31,6 +31,7 @@ from common.utils import (
     convert_respapi_to_model_response,
     generate_timestamp_utc,
     to_generic_streaming_chunk,
+    responses_eof_finalize_chunk,
 )
 
 
@@ -436,6 +437,16 @@ class ClaudeCodeRouter(CustomLLM):
 
                 yield generic_chunk
                 chunk_idx += 1
+
+            # EOF fallback: if provider ended stream without a terminal event and
+            # we have a pending tool with buffered args, emit once.
+            try:
+                eof_chunk = responses_eof_finalize_chunk()
+                if eof_chunk is not None:
+                    yield eof_chunk
+            except Exception:
+                # Ignore; best-effort fallback
+                pass
 
         except Exception as e:
             raise ProxyError(e) from e

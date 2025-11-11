@@ -109,6 +109,72 @@ def _maybe_emit_tool(item_id: str, default_index: int = 0) -> Optional[dict[str,
     return tool_use
 
 
+def responses_eof_finalize_chunk() -> Optional[GenericStreamingChunk]:
+    """
+    Finalize a pending tool call if the stream ended without a terminal
+    event. If we have buffered args for the adopted tool and they parse as
+    JSON, emit a single tool_use. Otherwise emit an assistant-visible error.
+    Always clears internal tool state.
+    """
+    try:
+        adopted = _RESPONSES_TOOL_ADOPTED
+        if not adopted or adopted not in _RESPONSES_TOOL_STATE:
+            # Nothing pending
+            return None
+        state = _RESPONSES_TOOL_STATE.get(adopted, {})
+        if state.get("emitted"):
+            return None
+        args_str = state.get("args", "")
+        # Strict JSON parse if non-empty; empty means {} is fine
+        if isinstance(args_str, str) and args_str:
+            try:
+                json.loads(args_str)
+                args_ok = True
+            except Exception:
+                args_ok = False
+        else:
+            args_ok = True
+
+        if args_ok:
+            tool_use = {
+                "index": state.get("index", 0),
+                "id": state.get("id"),
+                "type": "function",
+                "function": {
+                    "name": state.get("name"),
+                    "arguments": args_str or "{}",
+                },
+            }
+            chunk: GenericStreamingChunk = {
+                "text": "",
+                "is_finished": False,
+                "finish_reason": "",
+                "usage": None,
+                "index": state.get("index", 0),
+                "tool_use": tool_use,
+                "provider_specific_fields": {"responses_type": "eof_fallback"},
+            }
+            return chunk
+        # Emit an assistant-visible error if args could not be finalized
+        err = "Provider ended stream before tool arguments were finalized."
+        return {
+            "text": err,
+            "is_finished": False,
+            "finish_reason": "error",
+            "usage": None,
+            "index": 0,
+            "tool_use": None,
+            "provider_specific_fields": {"responses_type": "eof_fallback_error"},
+        }
+    finally:
+        # Clear state regardless
+        try:
+            _RESPONSES_TOOL_STATE.clear()
+        except Exception:
+            pass
+        _RESPONSES_TOOL_ADOPTED = None
+
+
 def generate_timestamp_utc() -> str:
     """
     Generate timestamp in format YYYYmmdd_HHMMSS_fff in UTC.
