@@ -112,6 +112,11 @@ class RoutedRequest:
         self.params_complapi.update(self.model_route.extra_params)
         self.params_complapi["stream"] = stream
 
+        # Drop Anthropic-only parameters
+        # Claude Code 2.x sends `context_management` on /v1/messages, but
+        # OpenAI's Chat Completions/Responses APIs do not support it
+        self.params_complapi.pop("context_management", None)
+
         if self.model_route.use_responses_api:
             # TODO What's a more reasonable way to decide when to unset
             #  temperature ?
