@@ -46,6 +46,8 @@ def env_var_to_bool(value: Optional[str], default: str = "false") -> bool:
     """
     return (value or default).lower() in ("true", "1", "on", "yes", "y")
 
+
+# TODO Refactor to avoid using global state if possible
 # Minimal state to accumulate Responses function_call arguments across chunks
 _RESPONSES_TOOL_STATE: dict[str, dict[str, Any]] = {}
 # Track which Responses tool item (by item_id) we have adopted for this turn.
@@ -102,9 +104,7 @@ def _maybe_emit_tool(item_id: str, default_index: int = 0) -> Optional[dict[str,
             "arguments": final_args,
         },
     }
-    _log_responses_tool(
-        f"emitting tool_use item_id={item_id} name={state.get('name')} index={tool_use['index']}"
-    )
+    _log_responses_tool(f"emitting tool_use item_id={item_id} name={state.get('name')} index={tool_use['index']}")
     state["emitted"] = True
     return tool_use
 
@@ -529,12 +529,14 @@ def convert_chat_messages_to_respapi(messages: list[Any]) -> list[dict[str, Any]
                                     if peek_id:
                                         break
                             call_id = peek_id or f"fc_{idx}"
-                        converted.append({
-                            "type": "function_call",
-                            "call_id": call_id,
-                            "name": name,
-                            "arguments": arguments,
-                        })
+                        converted.append(
+                            {
+                                "type": "function_call",
+                                "call_id": call_id,
+                                "name": name,
+                                "arguments": arguments,
+                            }
+                        )
                         last_func_call_id = call_id
                     except Exception:
                         continue
@@ -553,11 +555,13 @@ def convert_chat_messages_to_respapi(messages: list[Any]) -> list[dict[str, Any]
                 except Exception:
                     output_str = str(content)
 
-            converted.append({
-                "type": "function_call_output",
-                "call_id": call_id,
-                "output": output_str or "",
-            })
+            converted.append(
+                {
+                    "type": "function_call_output",
+                    "call_id": call_id,
+                    "output": output_str or "",
+                }
+            )
             continue
 
         # Drop tool_calls and function_call - Responses API doesn't support these in message content
@@ -778,6 +782,7 @@ def _default_content_type_for_role(role: str) -> str:
 
 def _try_parse_responses_chunk(chunk: Any) -> Optional[dict[str, Any]]:
     global _RESPONSES_TOOL_ADOPTED
+
     def _get(obj: Any, key: str, default: Any = None) -> Any:
         if isinstance(obj, dict):
             return obj.get(key, default)
@@ -823,16 +828,8 @@ def _try_parse_responses_chunk(chunk: Any) -> Optional[dict[str, Any]]:
         tool_name = None
         call_id = None
         try:
-            tool_name = (
-                _get(source, "name")
-                or _get(source, "function_name")
-                or _get(source, "tool_name")
-            )
-            call_id = (
-                _get(source, "call_id")
-                or _get(source, "tool_call_id")
-                or _get(source, "id")
-            )
+            tool_name = _get(source, "name") or _get(source, "function_name") or _get(source, "tool_name")
+            call_id = _get(source, "call_id") or _get(source, "tool_call_id") or _get(source, "id")
         except Exception:
             tool_name = None
             call_id = None
@@ -904,8 +901,14 @@ def _try_parse_responses_chunk(chunk: Any) -> Optional[dict[str, Any]]:
                 if _RESPONSES_TOOL_ADOPTED is None and isinstance(item_id_for_state, str):
                     _RESPONSES_TELEMETRY["adopted_item_id"] = item_id_for_state
                     _RESPONSES_TELEMETRY["adopted_output_index"] = index
-                elif _RESPONSES_TOOL_ADOPTED is not None and isinstance(item_id_for_state, str) and _RESPONSES_TOOL_ADOPTED != item_id_for_state:
-                    _RESPONSES_TELEMETRY["extra_tool_items_ignored"] = _RESPONSES_TELEMETRY.get("extra_tool_items_ignored", 0) + 1
+                elif (
+                    _RESPONSES_TOOL_ADOPTED is not None
+                    and isinstance(item_id_for_state, str)
+                    and _RESPONSES_TOOL_ADOPTED != item_id_for_state
+                ):
+                    _RESPONSES_TELEMETRY["extra_tool_items_ignored"] = (
+                        _RESPONSES_TELEMETRY.get("extra_tool_items_ignored", 0) + 1
+                    )
                 tool_use = _maybe_emit_tool(item_id_for_state, default_index=index)
 
     # Accumulate streaming function_call arguments
@@ -1066,7 +1069,13 @@ def _try_parse_responses_chunk(chunk: Any) -> Optional[dict[str, Any]]:
         finish_reason = "stop"
 
     # Terminal cleanup: clear buffered tool state to avoid leaks across turns
-    if chunk_type in {"response.completed", "response.failed", "response.canceled", "response.cancelled", "response.error"}:
+    if chunk_type in {
+        "response.completed",
+        "response.failed",
+        "response.canceled",
+        "response.cancelled",
+        "response.error",
+    }:
         try:
             _RESPONSES_TOOL_STATE.clear()
         except Exception:
