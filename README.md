@@ -1,13 +1,13 @@
 <p align="center">
     <img alt="Claude Code with GPT-5"
-        src="https://raw.githubusercontent.com/teremterem/claude-code-gpt-5/main/images/claude-code-gpt-5.jpeg">
+        src="https://raw.githubusercontent.com/teremterem/claude-code-gpt-5-codex/main/images/claude-code-gpt-5.jpeg">
 </p>
 
 This repository lets you use Anthropic's **Claude Code CLI** with OpenAI models such as **GPT-5 Codex, GPT-5.1, and others** via a local LiteLLM proxy.
 
 > ⚠️ **ATTENTION** ⚠️
 >
-> If you're here to set up `your own LiteLLM Server` (potentially with `LibreChat` or similar UI), head over to the [main-boilerplate](https://github.com/teremterem/claude-code-gpt-5/tree/main-boilerplate) branch. It contains a "boilerplate" version of this repo with Claude Code CLI stuff stripped away for simplicity, **and with a version of [README.md](https://github.com/teremterem/claude-code-gpt-5/blob/main-boilerplate/README.md) that specifically explains how to build on top of this repo as a boilerplate.**
+> If you're here to set up `your own LiteLLM Server` (potentially with `LibreChat` or similar UI), head over to the [main-boilerplate](https://github.com/teremterem/claude-code-gpt-5-codex/tree/main-boilerplate) branch. It contains a "boilerplate" version of this repo with Claude Code CLI stuff stripped away for simplicity, **and with a version of [README.md](https://github.com/teremterem/claude-code-gpt-5-codex/blob/main-boilerplate/README.md) that specifically explains how to build on top of this repo as a boilerplate.**
 
 ## Quick Start ⚡
 
@@ -26,8 +26,8 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
 
 1. **Clone this repository:**
    ```bash
-   git clone https://github.com/teremterem/claude-code-gpt-5.git
-   cd claude-code-gpt-5
+   git clone https://github.com/teremterem/claude-code-gpt-5-codex.git
+   cd claude-code-gpt-5-codex
    ```
 
 2. **Configure Environment Variables:**
@@ -156,11 +156,11 @@ This is planned to be fixed soon.
 ## And if you like the project, please give it a Star 💫
 
 <p align="center">
-<a href="https://www.star-history.com/#teremterem/claude-code-gpt-5&type=date&legend=top-left">
+<a href="https://www.star-history.com/#teremterem/claude-code-gpt-5-codex&type=date&legend=top-left">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=teremterem/claude-code-gpt-5&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=teremterem/claude-code-gpt-5&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=teremterem/claude-code-gpt-5&type=date&legend=top-left" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=teremterem/claude-code-gpt-5-codex&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=teremterem/claude-code-gpt-5-codex&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=teremterem/claude-code-gpt-5-codex&type=date&legend=top-left" />
  </picture>
 </a>
 </p>
