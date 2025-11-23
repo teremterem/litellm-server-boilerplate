@@ -1,6 +1,6 @@
 <p align="center">
     <img alt="Claude Code with GPT-5"
-        src="https://raw.githubusercontent.com/teremterem/claude-code-gpt-5-codex/main/images/claude-code-gpt-5.jpeg">
+        src="https://raw.githubusercontent.com/teremterem/claude-code-gpt-5-codex/main/images/claude-code-gpt-5-codex.jpeg">
 </p>
 
 This repository lets you use Anthropic's **Claude Code CLI** with OpenAI models such as **GPT-5-Codex, GPT-5.1, and others** via a local LiteLLM proxy.
