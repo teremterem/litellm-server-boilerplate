@@ -1,5 +1,5 @@
 <p align="center">
-    <img alt="Claude Code with GPT-5"
+    <img alt="Claude Code with GPT-5 Codex"
         src="https://raw.githubusercontent.com/teremterem/claude-code-gpt-5-codex/main/images/claude-code-gpt-5-codex2.jpeg">
 </p>
 
