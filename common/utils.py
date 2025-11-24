@@ -3,6 +3,7 @@
 """
 NOTE: The utilities in this module were mostly vibe-coded without review.
 """
+import os
 from datetime import UTC, datetime
 from typing import Any, Optional, Union
 
@@ -10,8 +11,18 @@ from litellm import GenericStreamingChunk
 
 
 class ProxyError(RuntimeError):
-    def __init__(self, error: Union[BaseException, str], highlight: bool = True):
-        if highlight:
+    def __init__(self, error: Union[BaseException, str], highlight: Optional[bool] = None):
+
+        final_highlight: bool
+        if highlight is None:
+            # No value provided, read from env var (default 'True')
+            env_val = os.environ.get("PROXY_ERROR_HIGHLIGHT", "True")
+            final_highlight = env_val.lower() not in ("false", "0", "no")
+        else:
+            # Value was provided, use it
+            final_highlight = highlight
+
+        if final_highlight:
             # Highlight error messages in red, so the actual problems are
             # easier to spot in long tracebacks
             super().__init__(f"\033[1;31m{error}\033[0m")
@@ -35,15 +46,18 @@ def env_var_to_bool(value: Optional[str], default: str = "false") -> bool:
 
 def generate_timestamp_utc() -> str:
     """
-    Generate timestamp in format YYYYmmdd_HHMMSS_fff in UTC.
+    Generate timestamp in format YYYYmmdd_HHMMSS_fff_fff in UTC.
 
     An example of how these timestamps are used later:
 
-    `.traces/20251005_140642_180_RESPONSE_STREAM.md`
+    `.traces/20251005_140642_180_342_RESPONSE_STREAM.md`
     """
     now = datetime.now(UTC)
-    # Keep only milliseconds (first 3 digits of microseconds)
-    return now.strftime("%Y%m%d_%H%M%S_%f")[:-3]
+
+    str_repr = now.strftime("%Y%m%d_%H%M%S_%f")
+    # Let's separate the milliseconds from the microseconds with an underscore
+    # to make it more readable
+    return f"{str_repr[:-3]}_{str_repr[-3:]}"
 
 
 def to_generic_streaming_chunk(chunk: Any) -> GenericStreamingChunk:
