@@ -121,7 +121,7 @@ cd <repo-root-dir>
    ```bash
    rm -rf claude_code_proxy/
    rm -rf docs/maintainers/
-   rm images/claude-code-gpt-5.jpeg
+   rm images/claude-code-*
    rm deploy-docker.sh
    rm kill-docker.sh
    rm run-docker.sh
