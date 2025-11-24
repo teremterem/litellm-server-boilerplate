@@ -264,7 +264,7 @@ cd <repo-root-dir>
     ```
 
     ```bash
-    git commit -m "Update pyproject.toml, Dockerfile and uv.lock"
+    git commit -m "Update Dockerfile, config.yaml, pyproject.toml and uv.lock"
     git push
     git status
     ```
