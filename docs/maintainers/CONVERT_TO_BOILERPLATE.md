@@ -162,7 +162,7 @@ cd <repo-root-dir>
    **Replace the existing ATTENTION clause at the top with the following text:**
 
    ```markdown
-   > **NOTE:** Checkout our [claude-code-gpt-5-codex](https://github.com/teremterem/claude-code-gpt-5-codex) repository, if you would like to use Anthropic's `Claude Code CLI` with OpenAI models like `GPT-5 Codex`, `GPT-5.1`, and others.
+   > **NOTE:** Check out our [claude-code-gpt-5-codex](https://github.com/teremterem/claude-code-gpt-5-codex) repository, if you would like to use Anthropic's `Claude Code CLI` with OpenAI models like `GPT-5 Codex`, `GPT-5.1`, and others.
    ```
 
    ```bash
@@ -171,7 +171,7 @@ cd <repo-root-dir>
    ```
 
    ```bash
-   git commit -m "Restore note about going back to CLI Proxy version"
+   git commit -m "Restore note about checking out Claude Code CLI Proxy repository"
    git push
    git status
    ```
