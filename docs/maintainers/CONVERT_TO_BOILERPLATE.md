@@ -162,7 +162,7 @@ cd <repo-root-dir>
    **Replace the existing ATTENTION clause at the top with the following text:**
 
    ```markdown
-   > **NOTE:** If you want to go back to the `Claude Code CLI Proxy` version of this repository, click [here](https://github.com/teremterem/claude-code-gpt-5).
+   > **NOTE:** Checkout our [claude-code-gpt-5-codex](https://github.com/teremterem/claude-code-gpt-5-codex) repository, if you would like to use Anthropic's `Claude Code CLI` with OpenAI models like `GPT-5 Codex`, `GPT-5.1`, and others.
    ```
 
    ```bash
