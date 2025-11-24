@@ -5,9 +5,9 @@
         src="images/librechat-master-yoda.jpg">
 </p>
 
-**A lightweight LiteLLM server boilerplate** pre-configured with `uv` and `Docker` for hosting your own **OpenAI- and Anthropic-compatible endpoints.** Perfect for **LibreChat** (a quick setup of which is included in this repository) or other UI clients. Contains an example of a custom provider that stylizes responses **(Yoda example)** to serve as a starting point for your own custom providers.
+**A lightweight LiteLLM server boilerplate** pre-configured with `uv` and `Docker` for hosting your own **OpenAI- and Anthropic-compatible endpoints.** Perfect with **LibreChat** as the web UI (a quick setup of which is included in this repository) or any other OpenAI / Anthropic API compatible client. Contains an example of a custom provider that stylizes responses (Yoda example) to serve as a starting point for your own custom providers (which you can think of as **your own AI agents and assistants**).
 
-> **NOTE:** If you want to go back to the `Claude Code CLI Proxy` version of this repository, click [here](https://github.com/teremterem/claude-code-gpt-5).
+> **NOTE:** Check out our [claude-code-gpt-5-codex](https://github.com/teremterem/claude-code-gpt-5-codex) repository, if you would like to use Anthropic's `Claude Code CLI` with OpenAI models like `GPT-5 Codex`, `GPT-5.1`, and others.
 
 ## Quick Start ⚡
 
@@ -28,7 +28,7 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
    git clone \
        --branch main-boilerplate \
        --origin boilerplate \
-       https://github.com/teremterem/claude-code-gpt-5.git \
+       https://github.com/teremterem/litellm-server-boilerplate.git \
        my-litellm-server
    ```
 
@@ -65,16 +65,21 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
    cp .env.template .env
    ```
 
-   Edit `.env` and add your OpenAI API key:
+   Edit `.env` and add your OpenAI API key or any other provider's API key(s) that you're planning to use:
    ```dotenv
    OPENAI_API_KEY=your-openai-api-key-here
+   ANTHROPIC_API_KEY=your-anthropic-api-key-here
+   GEMINI_API_KEY=your-gemini-api-key-here
 
-   # Optional (see .env.template for details):
+   ... # API key(s) of any other provider(s)
+
+   # Optional (see .env.template for explanation):
    # LITELLM_MASTER_KEY=strong-key-that-you-generated
 
-   # Some more optional settings (see .env.template for details)
-   ...
+   ... # Other optional settings (see .env.template)
    ```
+
+   See [Supported Models & Providers](https://docs.litellm.ai/docs/providers) document by LiteLLM for the full list of supported models and providers.
 
 5. **Configure Environment Variables for LibreChat:**
 
@@ -294,13 +299,3 @@ That’s it - your `main` branch now contains the latest boilerplate changes whi
 ## P. S. You are welcome to join our [MiniAgents Discord Server 👥](https://discord.gg/ptSvVnbwKt)
 
 ## And if you like the project, please give it a Star 💫
-
-<p align="center">
-<a href="https://www.star-history.com/#teremterem/claude-code-gpt-5&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=teremterem/claude-code-gpt-5&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=teremterem/claude-code-gpt-5&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=teremterem/claude-code-gpt-5&type=date&legend=top-left" />
- </picture>
-</a>
-</p>
