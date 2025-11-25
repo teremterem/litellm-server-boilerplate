@@ -9,6 +9,16 @@
 
 > **NOTE:** Check out our [claude-code-gpt-5-codex](https://github.com/teremterem/claude-code-gpt-5-codex) repository, if you would like to use Anthropic's `Claude Code CLI` with OpenAI models like `GPT-5 Codex`, `GPT-5.1`, and others.
 
+## Architecture 📝
+
+```
+OpenAI/Anthropic API compatible clients (LibreChat etc.)
+ ↓
+LiteLLM Server (Port 4000)
+ ↓
+Your custom agents
+```
+
 ## Quick Start ⚡
 
 ### Prerequisites
