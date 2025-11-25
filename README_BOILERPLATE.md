@@ -9,6 +9,16 @@
 
 > ⚠️ **ATTENTION** ⚠️ This `README` is intended for the [litellm-server-boilerplate](https://github.com/teremterem/litellm-server-boilerplate) repository.
 
+## Architecture 📝
+
+```
+OpenAI/Anthropic API compatible clients (LibreChat etc.)
+ ↓
+LiteLLM Server (Port 4000)
+ ↓
+Your custom agents
+```
+
 ## Quick Start ⚡
 
 ### Prerequisites
