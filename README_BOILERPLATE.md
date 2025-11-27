@@ -71,7 +71,7 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
    git remote add origin <your-remote-repository-url>
    ```
 
-   > **ATTENTION:** Make sure your remote repo does not have the `main` branch of its own already. Delete it, if it does.
+   > **ATTENTION:** Make sure your remote repo DOES NOT have the `main` branch of its own already. If it does, delete the remote `main` branch manually (OR use `--force` flag with the next command **AS LONG AS YOU KNOW WHAT YOU'RE DOING**).
 
    ```bash
    git push --set-upstream origin main
