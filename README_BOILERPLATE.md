@@ -296,7 +296,7 @@ Once you start customizing your copy, you will occasionally want to bring in the
 
 2. **Fetch the latest boilerplate branch.**
    ```bash
-   git fetch boilerplate main-boilerplate
+   git fetch boilerplate main:main-boilerplate
    ```
 
 3. **Switch to your local `main` branch.**
@@ -306,7 +306,7 @@ Once you start customizing your copy, you will occasionally want to bring in the
 
 4. **Merge the upstream updates into your branch.**
    ```bash
-   git merge boilerplate/main-boilerplate
+   git merge boilerplate/main
    ```
    If Git reports conflicts, resolve the files Git marks, `git add` them, and run `git commit` to complete the merge before continuing.
 
