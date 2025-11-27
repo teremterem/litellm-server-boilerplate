@@ -33,10 +33,9 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
 
 ### Setup 🛠️
 
-1. **Clone this repository's `main-boilerplate` branch into a local directory:**
+1. **Clone this repository, but use a special remote name (`boilerplate` instead of `origin`):**
    ```bash
    git clone \
-       --branch main-boilerplate \
        --origin boilerplate \
        https://github.com/teremterem/litellm-server-boilerplate.git \
        my-litellm-server
@@ -48,15 +47,25 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
 
    > **NOTE:** If you want to, you can replace `my-litellm-server` with a different project name in both commands above.
 
-   Notice, that the `git clone` command above uses `boilerplate` as the remote name to link back to the boilerplate repository. **This is because in the next steps you will set up `origin` to link to your own remote repository.**
+   The `git clone` command above uses `boilerplate` as the remote name instead of the usual `origin` **because in later steps you will set up `origin` to point to YOUR OWN remote repository.**
 
-2. **Create `main` branch from the `main-boilerplate` in your local repository:**
+2. **Rename `main` branch to `main-boilerplate` in your local repository:**
+
+   ```bash
+   git branch --move main main-boilerplate
+   ```
+
+   You are renaming it like this locally because this will later allow you to use this branch to occasionally pull in bugfixes, new features etc. from the original "boilerplate" repo, while making room for YOUR OWN `main` branch, which you will modify as you please and push to YOUR OWN remote (see further steps).
+
+3. **Create YOUR OWN `main` branch in your local repository:**
 
    ```bash
    git switch --create main
    ```
 
-3. **(Optional) Set up `origin` remote and push your `main` branch to your remote repository:**
+   It will be based on `main-boilerplate` (since this was the branch you were on when you ran the command).
+
+4. **(Optional) Set up `origin` remote and push your `main` branch to YOUR OWN remote repository:**
 
    ```bash
    git remote add origin <your-remote-repository-url>
@@ -68,7 +77,7 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
 
    Even though this step is optional, it is generally a good idea to have your own remote repository to push your changes to.
 
-4. **Configure Environment Variables for the LiteLLM Server:**
+5. **Configure Environment Variables for the LiteLLM Server:**
 
    Copy the template file to create your `.env`:
    ```bash
@@ -91,7 +100,7 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
 
    See [Supported Models & Providers](https://docs.litellm.ai/docs/providers) document by LiteLLM for the full list of supported models and providers.
 
-5. **Configure Environment Variables for LibreChat:**
+6. **Configure Environment Variables for LibreChat:**
 
    Copy `librechat/.env.example` to `librechat/.env`:
    ```bash
@@ -100,7 +109,7 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
 
    (Optional) Edit `librechat/.env` if necessary (in case of local runs, it will work even if you don't edit it).
 
-6. **Run your LiteLLM Server with LibreChat and the Yoda example** (make sure to install [Docker Desktop](https://docs.docker.com/desktop/) first):
+7. **Run your LiteLLM Server with LibreChat and the Yoda example** (make sure to install [Docker Desktop](https://docs.docker.com/desktop/) first):
 
    ```bash
    ./librechat/run-docker-compose.sh
