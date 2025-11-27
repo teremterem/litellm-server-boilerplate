@@ -89,8 +89,8 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
    Edit `.env` and add your OpenAI API key or any other provider's API key(s) that you're planning to use:
    ```dotenv
    OPENAI_API_KEY=your-openai-api-key-here
-   ANTHROPIC_API_KEY=your-anthropic-api-key-here
-   GEMINI_API_KEY=your-gemini-api-key-here
+   #ANTHROPIC_API_KEY=your-anthropic-api-key-here
+   #GEMINI_API_KEY=your-gemini-api-key-here
 
    ... # API key(s) of any other provider(s)
 
