@@ -73,7 +73,7 @@ cd <repo-root-dir>
    ```
 
    ```bash
-   git push --set-upstream origin boilerplate-merging-branch
+   git push --set-upstream boilerplate boilerplate-merging-branch
    ```
 
    > ⚠️ **ATTENTION** ⚠️ If `boilerplate-merging-branch` already exists, either locally or on the remote, make sure to delete both - the local branch and the remote branch - and then retry the command(s) above.
@@ -97,7 +97,7 @@ cd <repo-root-dir>
    ```
 
    ```bash
-   git commit -m 'Merge remote-tracking branch '\''origin/main'\'' into boilerplate-merging-branch'
+   git commit -m 'Merge remote-tracking branch '\''superorigin/main'\'' into boilerplate-merging-branch'
    git push
    git status
    ```
@@ -109,7 +109,7 @@ cd <repo-root-dir>
    ```
 
    ```bash
-   git push --set-upstream origin boilerplate-MANUAL-merging-branch
+   git push --set-upstream boilerplate boilerplate-MANUAL-merging-branch
    ```
 
    > ⚠️ **ATTENTION** ⚠️ If `boilerplate-MANUAL-merging-branch` already exists, either locally or on the remote, make sure to delete both - the local branch and the remote branch - and then retry the command(s) above.
