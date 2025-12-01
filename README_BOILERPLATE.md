@@ -34,6 +34,9 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
 ### Setup 🛠️
 
 1. **Clone this repository, but use a special remote name (`boilerplate` instead of `origin`):**
+
+   The reason `git clone` below uses `boilerplate` as the remote name instead of the usual `origin` is because this will enable you to set up `origin` to point to YOUR OWN remote repository in the later steps of this guide.
+
    ```bash
    git clone \
        --origin boilerplate \
@@ -43,27 +46,36 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
 
    ```bash
    cd my-litellm-server
+   git status
    ```
 
    > **NOTE:** If you want to, you can replace `my-litellm-server` with a different project name in both commands above.
 
-   The `git clone` command above uses `boilerplate` as the remote name instead of the usual `origin` **because in later steps you will set up `origin` to point to YOUR OWN remote repository.**
-
 2. **Rename `main` branch to `main-boilerplate` in your local repository:**
+
+   This will later allow you to use the local `main-boilerplate` branch to occasionally pull in bugfixes, new features etc. from the original `litellm-server-boilerplate` repo, while making room for YOUR OWN `main` branch, which you will modify as you please and push to YOUR OWN remote (see further steps).
 
    ```bash
    git branch --move main main-boilerplate
+   git status
    ```
-
-   You are renaming it like this locally because this will later allow you to use this branch to occasionally pull in bugfixes, new features etc. from the original "boilerplate" repo, while making room for YOUR OWN `main` branch, which you will modify as you please and push to YOUR OWN remote (see further steps).
 
 3. **Create YOUR OWN `main` branch in your local repository:**
 
+   Double check that you're still on the `main-boilerplate` branch (just in case).
+
    ```bash
-   git switch --create main
+   git switch main-boilerplate
+   git pull
+   git status
    ```
 
-   It will be based on `main-boilerplate` (since this was the branch you were on when you ran the command).
+   Then create your own `main` branch (which will be based on `main-boilerplate`).
+
+   ```bash
+   git switch --create main
+   git status
+   ```
 
 4. **(Optional) Set up `origin` remote and push your `main` branch to YOUR OWN remote repository:**
 
@@ -71,10 +83,11 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
    git remote add origin <your-remote-repository-url>
    ```
 
-   > **ATTENTION:** Make sure your remote repo DOES NOT have the `main` branch of its own already. If it does, delete the remote `main` branch manually (OR use `--force` flag with the next command **AS LONG AS YOU KNOW WHAT YOU'RE DOING**).
+   > **ATTENTION:** Make sure your remote repo DOES NOT have the `main` branch of its own already. If it does, **EITHER** delete the remote `main` branch manually via a web interface, an app, etc. **OR** add `--force` flag to the `git push` command to completely overwrite the remote `main` branch with all its history **(choose the latter ONLY IF YOU FULLY UNDERSTAND THE RISKS of using the "--force" flag when working with Git CLI AND KNOW EXACTLY WHAT YOU'RE DOING).**
 
    ```bash
    git push --set-upstream origin main
+   git status
    ```
 
    Even though this step is optional, it is generally a good idea to have your own remote repository to push your changes to.
