@@ -139,6 +139,8 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
 
 4. **That's it!** Your Claude Code client will now use the **OpenAI models** that this repo recommends by default (unless you explicitly specified different choices in your `.env` file). 🎯
 
+---
+
 ### Model aliases
 
 You can find the full list of available OpenAI models in the [OpenAI API documentation](https://platform.openai.com/docs/models). Additionally, this proxy allows you to control the reasoning effort level for each model by appending it to the model name following the pattern `-reason-<effort>` (or `-reasoning-<effort>`, if you prefer). Here are some examples:
