@@ -61,7 +61,7 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
 
 3. **Create YOUR OWN `main` branch in your local repository:**
 
-   Double check that you're still on the `main-boilerplate` branch (just in case).
+   Double-check that you're on the `main-boilerplate` branch (just in case).
 
    ```bash
    git switch main-boilerplate
