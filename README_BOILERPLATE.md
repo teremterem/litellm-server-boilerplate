@@ -46,7 +46,6 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
 
    ```bash
    cd my-litellm-server
-   git status
    ```
 
    > **NOTE:** If you want to, you can replace `my-litellm-server` with a different project name in both commands above.
