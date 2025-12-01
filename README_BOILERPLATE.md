@@ -53,7 +53,7 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
 
 2. **Rename `main` branch to `main-boilerplate` in your local repository:**
 
-   This will later allow you to use the local `main-boilerplate` branch to occasionally pull in bugfixes, new features etc. from the original `litellm-server-boilerplate` repo, while making room for YOUR OWN `main` branch, which you will modify as you please and push to YOUR OWN remote (see further steps).
+   This will later allow you to use the local `main-boilerplate` branch to occasionally pull in bugfixes, new features, etc. from the original `litellm-server-boilerplate` repo, while making room for YOUR OWN `main` branch, which you will modify as you please and push to YOUR OWN remote (see further steps).
 
    ```bash
    git branch --move main main-boilerplate
