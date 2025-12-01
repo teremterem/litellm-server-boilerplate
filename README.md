@@ -80,7 +80,9 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
    git remote add origin <your-remote-repository-url>
    ```
 
-   > **ATTENTION:** Make sure your remote repo DOES NOT have the `main` branch of its own already. If it does, **EITHER** delete the remote `main` branch manually via a web interface, an app, etc. **OR** add `--force` flag to the `git push` command to completely overwrite the remote `main` branch with all its history. **⚠️ Choose the latter ONLY IF YOU FULLY UNDERSTAND THE RISKS of using the `--force` flag when working with Git CLI AND KNOW EXACTLY WHAT YOU'RE DOING ⚠️**
+   > **ATTENTION:** Make sure your remote repo DOES NOT have the `main` branch of its own already. If it does, **EITHER** delete the remote `main` branch manually via a web interface, an app, etc. **OR** add `--force` flag to the `git push` command to completely overwrite the remote `main` branch with all its history.
+   >
+   > **⚠️ Choose the latter ONLY IF YOU FULLY UNDERSTAND THE RISKS of using the `--force` flag when working with Git CLI AND KNOW EXACTLY WHAT YOU'RE DOING ⚠️**
 
    ```bash
    git push --set-upstream origin main
