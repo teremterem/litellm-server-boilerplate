@@ -104,10 +104,10 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
 
    ```dotenv
    OPENAI_API_KEY=your-openai-api-key-here
-   #ANTHROPIC_API_KEY=your-anthropic-api-key-here
-   #GEMINI_API_KEY=your-gemini-api-key-here
+   # ANTHROPIC_API_KEY=your-anthropic-api-key-here
+   # GEMINI_API_KEY=your-gemini-api-key-here
 
-   ... # API key(s) of any other provider(s)
+   ... # API keys (and other env vars) of any other providers
 
    # Optional (see .env.template for explanation):
    # LITELLM_MASTER_KEY=strong-key-that-you-generated
