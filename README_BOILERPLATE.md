@@ -57,7 +57,6 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
 
    ```bash
    git branch --move main main-boilerplate
-   git status
    ```
 
 3. **Create YOUR OWN `main` branch in your local repository:**
@@ -74,7 +73,6 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
 
    ```bash
    git switch --create main
-   git status
    ```
 
 4. **(Optional) Set up `origin` remote and push your `main` branch to YOUR OWN remote repository:**
@@ -87,7 +85,6 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
 
    ```bash
    git push --set-upstream origin main
-   git status
    ```
 
    Even though this step is optional, it is generally a good idea to have your own remote repository to push your changes to.
