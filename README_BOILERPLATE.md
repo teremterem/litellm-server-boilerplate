@@ -308,7 +308,7 @@ docker buildx build \
 
 ## Staying up to date with the Boilerplate
 
-Once you start customizing your copy, you will occasionally want to bring in the newest boilerplate improvements. The steps below assume you cloned the boilerplate with the `boilerplate` remote (see the setup section above) and that your own repository is attached as `origin`.
+Once you start customizing your copy, you might want to occasionally bring in the newest Boilerplate improvements. The steps below assume you cloned the original Boilerplate using `boilerplate` as the remote **(see the `"Setup"` section in the beginning)** and that YOUR OWN repository is connected as `origin`.
 
 1. **Make sure your working tree is clean.**
 
@@ -344,7 +344,7 @@ Once you start customizing your copy, you will occasionally want to bring in the
    git push origin main
    ```
 
-That’s it - your `main` branch now contains the latest boilerplate changes while keeping your customizations in place.
+That’s it - your `main` branch now contains the latest Boilerplate changes while keeping your customizations in place.
 
 ## P. S. You are welcome to join our [MiniAgents Discord Server 👥](https://discord.gg/ptSvVnbwKt)
 
