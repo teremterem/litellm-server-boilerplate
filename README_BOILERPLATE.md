@@ -147,7 +147,13 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
 
    > **NOTE:** For consistent behavior it is better to switch to the `librechat/` subdirectory before running the `docker compose` command above (even if you specified the aforementioned compose yaml files via the `-f` flags explicitly), hence the `cd` command right before it.
 
-**That's it!** You should be able to access the LibreChat UI at **http://localhost:3080**, and after registering an account in your local LibreChat instance, you should be able to see something similar to what you see on the screenshot at the beginning of this README. 🎯
+8. **Lastly,**
+
+- Navigate to **http://localhost:3080** in your web browser to open the LibreChat login page.
+- Use the **`Sign up`** link under the login form to create an account.
+- Log in with your new credentials.
+
+**That's it!** You should now see a chat interface with **`Yoda`** as a working assistant example, just like in the screenshot at the beginning. 🎯
 
 ---
 
