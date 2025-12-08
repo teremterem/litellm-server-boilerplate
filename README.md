@@ -48,7 +48,7 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
    cd my-litellm-server
    ```
 
-   > **NOTE:** If you want to, you can replace `my-litellm-server` with a different project name in both commands above.
+   > **NOTE:** You can replace `my-litellm-server` with a different name in both commands above.
 
 2. **Rename `main` branch to `main-boilerplate` in your local repository:**
 
@@ -80,7 +80,7 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
    git remote add origin <your-remote-repository-url>
    ```
 
-   > **ATTENTION:** Make sure your remote repo DOES NOT have the `main` branch of its own already. If it does, **EITHER** delete the remote `main` branch manually via a web interface, an app, etc. **OR** add `--force` flag to the `git push` command to completely overwrite the remote `main` branch with all its history.
+   > **ATTENTION:** Make sure your remote repo DOES NOT have a `main` branch of its own already. If it does, **EITHER** delete the remote `main` branch manually via a web interface, an app, etc. **OR** add `--force` flag to the `git push` command below to completely overwrite the remote `main` branch with all its history.
    >
    > **⚠️ Choose the latter ONLY IF YOU FULLY UNDERSTAND THE RISKS of using the `--force` flag when working with Git CLI AND KNOW EXACTLY WHAT YOU'RE DOING ⚠️**
 
@@ -147,7 +147,13 @@ If you are going to use GPT-5 via API for the first time, **OpenAI may require y
 
    > **NOTE:** For consistent behavior it is better to switch to the `librechat/` subdirectory before running the `docker compose` command above (even if you specified the aforementioned compose yaml files via the `-f` flags explicitly), hence the `cd` command right before it.
 
-**That's it!** You should be able to access the LibreChat UI at **http://localhost:3080**, and after registering an account in your local LibreChat instance, you should be able to see something similar to what you see on the screenshot at the beginning of this README. 🎯
+8. **Lastly,**
+
+- Navigate to **http://localhost:3080** in your web browser to open the LibreChat login page.
+- Use the **`Sign up`** link under the login form to create an account.
+- Log in with your new credentials.
+
+**That's it!** You should now see a chat interface with **`Yoda`** as a working assistant example, just like in the screenshot at the beginning. 🎯
 
 ---
 
@@ -302,7 +308,7 @@ docker buildx build \
 
 ## Staying up to date with the Boilerplate
 
-Once you start customizing your copy, you will occasionally want to bring in the newest boilerplate improvements. The steps below assume you cloned the boilerplate with the `boilerplate` remote (see the setup section above) and that your own repository is attached as `origin`.
+Once you start customizing your copy, you might want to occasionally bring in the newest Boilerplate improvements. The steps below assume you cloned the original Boilerplate using `boilerplate` as the remote **(see the `"Setup"` section in the beginning)** and that YOUR OWN repository is connected as `origin`.
 
 1. **Make sure your working tree is clean.**
 
@@ -338,7 +344,7 @@ Once you start customizing your copy, you will occasionally want to bring in the
    git push origin main
    ```
 
-That’s it - your `main` branch now contains the latest boilerplate changes while keeping your customizations in place.
+That’s it - your `main` branch now contains the latest Boilerplate changes while keeping your customizations in place.
 
 ## P. S. You are welcome to join our [MiniAgents Discord Server 👥](https://discord.gg/ptSvVnbwKt)
 
